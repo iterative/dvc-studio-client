@@ -41,9 +41,10 @@ def _convert_to_studio_url(remote_url):
     return studio_url
 
 
-def get_studio_repo_url(git_repo) -> Optional[str]:
+def get_studio_repo_url() -> Optional[str]:
     studio_url = None
     try:
+        git_repo = Repo()
         remote_url = _get_remote_url(git_repo)
         studio_url = _convert_to_studio_url(remote_url)
     except GitError:
@@ -65,13 +66,14 @@ def get_studio_repo_url(git_repo) -> Optional[str]:
 
 def get_studio_token_and_repo_url():
     studio_token = getenv(STUDIO_TOKEN, None)
-    if not studio_token:
+    if studio_token is None:
         logger.debug("STUDIO_TOKEN not found. Skipping `post_studio_live_metrics`")
+        return None, None
 
     studio_repo_url = getenv(STUDIO_REPO_URL, None)
     if studio_repo_url is None:
         logger.debug(f"`{STUDIO_REPO_URL}` not found. Trying to automatically find it.")
-        studio_repo_url = get_studio_repo_url(Repo())
+        studio_repo_url = get_studio_repo_url()
     return studio_token, studio_repo_url
 
 
