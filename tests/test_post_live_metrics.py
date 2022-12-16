@@ -9,6 +9,7 @@ from dvc_studio_client.post_live_metrics import (
     _convert_to_studio_url,
     _get_remote_url,
     get_studio_repo_url,
+    get_studio_token_and_repo_url,
     post_live_metrics,
 )
 
@@ -63,7 +64,7 @@ def test_get_studio_repo_url(caplog, mocker):
         side_effect=GitError(),
     )
     caplog.clear()
-    get_studio_repo_url(None)
+    get_studio_repo_url()
     assert caplog.records[0].message == (
         "Tried to find remote url for the active branch but failed.\n"
     )
@@ -78,7 +79,7 @@ def test_get_studio_repo_url(caplog, mocker):
         return_value="bad@repo:url",
     )
     caplog.clear()
-    get_studio_repo_url(None)
+    get_studio_repo_url()
     assert caplog.records[0].message == (
         "Found invalid remote url for the active branch.\n"
         f" Supported urls must start with any of {VALID_URLS}"
@@ -315,3 +316,10 @@ def test_post_live_metrics_bad_response(mocker, monkeypatch):
         )
         is False
     )
+
+
+def test_get_studio_token_and_repo_url_skip_repo_url(monkeypatch):
+    monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
+    token, repo_url = get_studio_token_and_repo_url()
+    assert token is None
+    assert repo_url is None  # Skipped call to get_repo_url
