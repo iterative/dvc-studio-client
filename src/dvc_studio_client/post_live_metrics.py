@@ -119,7 +119,7 @@ def post_live_metrics(
             Defaults to `None`.
             Only used when `event_type="start"`.
             ```
-            metrics={
+            params={
                 "dvclive/params.yaml": {
                     "data": {
                         "foo": "bar"
