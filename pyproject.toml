@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=48", "setuptools_scm[toml]>=6.3.1"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+
+[tool.black]
+line-length = 88
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+known_first_party = ["dvc-studio-client"]
+line_length = 88
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+
+[tool.coverage.run]
+branch = true
+source = ["dvc-studio-client", "tests"]
+
+[tool.coverage.paths]
+source = ["src", "*/site-packages"]
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "if typing.TYPE_CHECKING:",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "raise AssertionError",
+    "@overload",
+]
+
+[tool.codespell]
+ignore-words-list = " "
+
+[tool.bandit]
+exclude_dirs = ["tests"]
+skips = ["B101"]

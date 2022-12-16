@@ -1,0 +1,19 @@
+{
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "grammarly.selectors": [
+        {
+            "language": "python",
+            "scheme": "file",
+            "pattern": "src/dvc_studio_client/post_live_metrics.py"
+        },
+        {
+            "language": "restructuredtext",
+            "scheme": "file",
+            "pattern": "README.rst"
+        }
+    ]
+}
