@@ -144,12 +144,12 @@ def test_post_live_metrics_start_event(mocker, caplog, monkeypatch):
         timeout=5,
     )
 
-    assert post_live_metrics(
+    post_live_metrics(
         "start",
         "f" * 40,
         "fooname",
         "fooclient",
-        params={"params.yaml": {"data": {"foo": "bar"}}},
+        params={"params.yaml": {"foo": "bar"}},
     )
 
     mocked_post.assert_called_with(
@@ -160,7 +160,7 @@ def test_post_live_metrics_start_event(mocker, caplog, monkeypatch):
             "baseline_sha": "f" * 40,
             "name": "fooname",
             "client": "fooclient",
-            "params": {"params.yaml": {"data": {"foo": "bar"}}},
+            "params": {"params.yaml": {"foo": "bar"}},
         },
         headers={
             "Authorization": "token FOO_TOKEN",

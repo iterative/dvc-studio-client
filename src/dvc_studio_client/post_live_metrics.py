@@ -119,13 +119,10 @@ def post_live_metrics(
             ```
         params (Optional[Dict[str, Any]]): Updates to DVC param files.
             Defaults to `None`.
-            Only used when `event_type="start"`.
             ```
             params={
                 "dvclive/params.yaml": {
-                    "data": {
-                        "foo": "bar"
-                    }
+                    "foo": "bar"
                 }
             }
             ```
@@ -184,7 +181,6 @@ def post_live_metrics(
     else:
         logger.warning(f"Invalid `event_type`: {event_type}")
         return None
-
     try:
         SCHEMAS_BY_TYPE[event_type](body)
     except (Invalid, MultipleInvalid) as e:
