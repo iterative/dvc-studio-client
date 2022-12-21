@@ -22,15 +22,12 @@ BASE_SCHEMA = Schema(
         "env": dict,
         "client": str,
         "errors": [ERROR_SCHEMA],
+        "params": {str: dict},
         # Required("timestamp"): iso_datetime,  # TODO: decide if we need this
     }
 )
 SCHEMAS_BY_TYPE = {
-    "start": BASE_SCHEMA.extend(
-        {
-            "params": {str: {"data": dict, "error": ERROR_SCHEMA}},
-        }
-    ),
+    "start": BASE_SCHEMA,
     "data": BASE_SCHEMA.extend(
         {
             Required("step"): int,
