@@ -844,11 +844,10 @@ Defaults to <code>None</code>.</p></td>
         <span class="s2">&quot;client&quot;</span><span class="p">:</span> <span class="n">client</span><span class="p">,</span>
     <span class="p">}</span>
 
-    <span class="k">if</span> <span class="n">event_type</span> <span class="o">==</span> <span class="s2">&quot;start&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
-            <span class="n">body</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span>
+    <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
+        <span class="n">body</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span>
 
-    <span class="k">elif</span> <span class="n">event_type</span> <span class="o">==</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">event_type</span> <span class="o">==</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">step</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Missing `step` in `data` event.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
@@ -862,9 +861,10 @@ Defaults to <code>None</code>.</p></td>
         <span class="k">if</span> <span class="n">experiment_rev</span><span class="p">:</span>
             <span class="n">body</span><span class="p">[</span><span class="s2">&quot;experiment_rev&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">experiment_rev</span>
 
-    <span class="k">else</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">event_type</span> <span class="o">!=</span> <span class="s2">&quot;start&quot;</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid `event_type`: </span><span class="si">{</span><span class="n">event_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
+
     <span class="k">try</span><span class="p">:</span>
         <span class="n">SCHEMAS_BY_TYPE</span><span class="p">[</span><span class="n">event_type</span><span class="p">](</span><span class="n">body</span><span class="p">)</span>
     <span class="k">except</span> <span class="p">(</span><span class="n">Invalid</span><span class="p">,</span> <span class="n">MultipleInvalid</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
