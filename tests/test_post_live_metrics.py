@@ -212,6 +212,32 @@ def test_post_live_metrics_data(mocker, caplog, monkeypatch):
         "fooname",
         "fooclient",
         step=0,
+        params={"dvclive/params.yaml": {"foo": "bar"}},
+    )
+    mocked_post.assert_called_with(
+        "https://studio.iterative.ai/api/live",
+        json={
+            "type": "data",
+            "repo_url": "FOO_REPO_URL",
+            "baseline_sha": "f" * 40,
+            "name": "fooname",
+            "client": "fooclient",
+            "step": 0,
+            "params": {"dvclive/params.yaml": {"foo": "bar"}},
+        },
+        headers={
+            "Authorization": "token FOO_TOKEN",
+            "Content-type": "application/json",
+        },
+        timeout=5,
+    )
+
+    assert post_live_metrics(
+        "data",
+        "f" * 40,
+        "fooname",
+        "fooclient",
+        step=0,
         metrics={"dvclive/metrics.json": {"data": {"step": 0, "foo": 1}}},
         plots={"dvclive/plots/metrics/foo.tsv": {"data": [{"step": 0, "foo": 1.0}]}},
     )

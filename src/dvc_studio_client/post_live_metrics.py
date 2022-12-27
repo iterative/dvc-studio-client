@@ -160,11 +160,10 @@ def post_live_metrics(
         "client": client,
     }
 
-    if event_type == "start":
-        if params:
-            body["params"] = params
+    if params:
+        body["params"] = params
 
-    elif event_type == "data":
+    if event_type == "data":
         if step is None:
             logger.warning("Missing `step` in `data` event.")
             return None
@@ -178,9 +177,10 @@ def post_live_metrics(
         if experiment_rev:
             body["experiment_rev"] = experiment_rev
 
-    else:
+    elif event_type != "start":
         logger.warning(f"Invalid `event_type`: {event_type}")
         return None
+
     try:
         SCHEMAS_BY_TYPE[event_type](body)
     except (Invalid, MultipleInvalid) as e:
