@@ -51,17 +51,12 @@ exclude_lines = [
 
 [tool.codespell]
 ignore-words-list = " "
-<<<<<<<
-=======
-warn_unreachable = true
-files = ["src", "tests"]
 
 [tool.pylint.format]
 max-line-length = 88
 
 [tool.pylint.message_control]
 enable = ["c-extension-no-member", "no-else-return"]
->>>>>>>
 
 [tool.bandit]
 exclude_dirs = ["tests"]
