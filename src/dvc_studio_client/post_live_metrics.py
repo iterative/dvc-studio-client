@@ -19,41 +19,13 @@ def _get_remote_url(git_repo):
     return git_repo.git.ls_remote("--get-url")
 
 
-VALID_PREFIXES = ("https://", "git@")
-VALID_PROVIDERS = ("github.com", "gitlab.com", "bitbucket.org")
-VALID_URLS = [
-    f"{prefix}{provider}" for prefix in VALID_PREFIXES for provider in VALID_PROVIDERS
-]
-
-
-def _convert_to_studio_url(remote_url):
-    studio_url = ""
-    for prefix in VALID_PREFIXES:
-        for provider in VALID_PROVIDERS:
-            if remote_url.startswith(f"{prefix}{provider}"):
-                repo = remote_url.split(provider)[-1]
-                repo = repo.rstrip(".git")
-                repo = repo.lstrip("/")
-                repo = repo.lstrip(":")
-                studio_url = f"{provider.split('.')[0]}:{repo}"
-    if not studio_url:
-        raise ValueError
-    return studio_url
-
-
 def get_studio_repo_url() -> Optional[str]:
     studio_url = None
     try:
         git_repo = Repo()
-        remote_url = _get_remote_url(git_repo)
-        studio_url = _convert_to_studio_url(remote_url)
+        studio_url = _get_remote_url(git_repo)
     except GitError:
         logger.debug("Tried to find remote url for the active branch but failed.\n")
-    except ValueError:
-        logger.debug(
-            "Found invalid remote url for the active branch.\n"
-            f" Supported urls must start with any of {VALID_URLS}"
-        )
     finally:
         if not studio_url:
             logger.warning(
