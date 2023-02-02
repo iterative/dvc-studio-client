@@ -13,8 +13,9 @@ from .env import STUDIO_ENDPOINT, STUDIO_REPO_URL, STUDIO_TOKEN
 from .schema import SCHEMAS_BY_TYPE
 
 logger = logging.getLogger(__name__)
+logger.setLevel(os.getenv("DVC_STUDIO_CLIENT_LOGLEVEL, "INFO").upper())
 
-
+                          
 def _get_remote_url(git_repo):
     return git_repo.git.ls_remote("--get-url")
 
