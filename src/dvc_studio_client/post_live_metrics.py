@@ -15,7 +15,7 @@ from .schema import SCHEMAS_BY_TYPE
 logger = logging.getLogger(__name__)
 logger.setLevel(getenv("DVC_STUDIO_CLIENT_LOGLEVEL", "INFO").upper())
 
-                          
+
 def _get_remote_url(git_repo):
     return git_repo.git.ls_remote("--get-url")
 
