@@ -23,6 +23,7 @@ BASE_SCHEMA = Schema(
         "client": str,
         "errors": [ERROR_SCHEMA],
         "params": {str: dict},
+        "metrics": {str: {"data": dict, "error": ERROR_SCHEMA}},
         # Required("timestamp"): iso_datetime,  # TODO: decide if we need this
     }
 )
@@ -31,7 +32,6 @@ SCHEMAS_BY_TYPE = {
     "data": BASE_SCHEMA.extend(
         {
             Required("step"): int,
-            "metrics": {str: {"data": dict, "error": ERROR_SCHEMA}},
             "plots": {str: {"data": [dict], "props": dict, "error": ERROR_SCHEMA}},
         }
     ),

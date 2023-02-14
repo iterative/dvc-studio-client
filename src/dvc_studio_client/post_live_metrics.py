@@ -135,13 +135,14 @@ def post_live_metrics(
     if params:
         body["params"] = params
 
+    if metrics:
+        body["metrics"] = metrics
+
     if event_type == "data":
         if step is None:
             logger.warning("Missing `step` in `data` event.")
             return None
         body["step"] = step
-        if metrics:
-            body["metrics"] = metrics
         if plots:
             body["plots"] = plots
 
