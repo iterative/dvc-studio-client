@@ -262,6 +262,30 @@ def test_post_live_metrics_done(mocker, caplog, monkeypatch):
         timeout=5,
     )
 
+    assert post_live_metrics(
+        "done",
+        "f" * 40,
+        "fooname",
+        "fooclient",
+        metrics={"dvclive/metris.json": {"data": {"foo": 1}}},
+    )
+    mocked_post.assert_called_with(
+        "https://studio.iterative.ai/api/live",
+        json={
+            "type": "done",
+            "repo_url": "FOO_REPO_URL",
+            "baseline_sha": "f" * 40,
+            "name": "fooname",
+            "client": "fooclient",
+            "metrics": {"dvclive/metris.json": {"data": {"foo": 1}}},
+        },
+        headers={
+            "Authorization": "token FOO_TOKEN",
+            "Content-type": "application/json",
+        },
+        timeout=5,
+    )
+
 
 def test_post_live_metrics_bad_response(mocker, monkeypatch):
     monkeypatch.setenv(STUDIO_TOKEN, "FOO_TOKEN")
