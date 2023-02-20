@@ -630,14 +630,7 @@ Defaults to <code>None</code>.</p></td>
 
       <details class="quote">
         <summary>Source code in <code>dvc_studio_client/post_live_metrics.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 52</span>
-<span class="normal"> 53</span>
-<span class="normal"> 54</span>
-<span class="normal"> 55</span>
-<span class="normal"> 56</span>
-<span class="normal"> 57</span>
-<span class="normal"> 58</span>
-<span class="normal"> 59</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 59</span>
 <span class="normal"> 60</span>
 <span class="normal"> 61</span>
 <span class="normal"> 62</span>
@@ -762,7 +755,14 @@ Defaults to <code>None</code>.</p></td>
 <span class="normal">181</span>
 <span class="normal">182</span>
 <span class="normal">183</span>
-<span class="normal">184</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">post_live_metrics</span><span class="p">(</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">post_live_metrics</span><span class="p">(</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;done&quot;</span><span class="p">],</span>
     <span class="n">baseline_sha</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -870,7 +870,7 @@ Defaults to <code>None</code>.</p></td>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">SCHEMAS_BY_TYPE</span><span class="p">[</span><span class="n">event_type</span><span class="p">](</span><span class="n">body</span><span class="p">)</span>
     <span class="k">except</span> <span class="p">(</span><span class="n">Invalid</span><span class="p">,</span> <span class="n">MultipleInvalid</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">humanize_error</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">humanize_error</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;post_studio_live_metrics `</span><span class="si">{</span><span class="n">event_type</span><span class="si">=}</span><span class="s2">`&quot;</span><span class="p">)</span>
