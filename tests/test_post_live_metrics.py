@@ -19,51 +19,47 @@ def test_get_remote_url(tmpdir):
 
 
 def test_get_studio_repo_url(caplog, mocker):
-    caplog.set_level(logging.DEBUG)
-
     from git.exc import GitError
 
     mocker.patch(
         "dvc_studio_client.post_live_metrics._get_remote_url",
         side_effect=GitError(),
     )
-    caplog.clear()
-    get_studio_repo_url()
-    assert caplog.records[0].message == (
-        "Tried to find remote url for the active branch but failed.\n"
-    )
-    assert caplog.records[1].message == (
-        "Couldn't find a valid Studio Repo URL.\n"
-        "You can try manually setting the environment variable "
-        f"`{STUDIO_REPO_URL}`."
-    )
+    with caplog.at_level(logging.DEBUG, logger="dvc_studio_client.post_live_metrics"):
+        get_studio_repo_url()
+        assert caplog.records[0].message == (
+            "Tried to find remote url for the active branch but failed.\n"
+        )
+        assert caplog.records[1].message == (
+            "Couldn't find a valid Studio Repo URL.\n"
+            "You can try manually setting the environment variable "
+            f"`{STUDIO_REPO_URL}`."
+        )
 
 
 def test_post_live_metrics_skip_on_missing_token(caplog):
-    caplog.set_level(logging.DEBUG)
-    assert post_live_metrics("start", "current_rev", "fooname", "fooclient") is None
-    assert caplog.records[0].message == (
-        "STUDIO_TOKEN not found. Skipping `post_studio_live_metrics`"
-    )
+    with caplog.at_level(logging.DEBUG, logger="dvc_studio_client.post_live_metrics"):
+        assert post_live_metrics("start", "current_rev", "fooname", "fooclient") is None
+        assert caplog.records[0].message == (
+            "STUDIO_TOKEN not found. Skipping `post_studio_live_metrics`"
+        )
 
 
 def test_post_live_metrics_skip_on_schema_error(caplog, monkeypatch):
     monkeypatch.setenv(STUDIO_TOKEN, "FOO_TOKEN")
     monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
-    caplog.set_level(logging.DEBUG)
+    with caplog.at_level(logging.DEBUG, logger="dvc_studio_client.post_live_metrics"):
+        assert post_live_metrics("start", "bad_hash", "fooname", "fooclient") is None
+        assert caplog.records[0].message == (
+            "expected a length 40 commit sha for dictionary value @ "
+            "data['baseline_sha']. Got 'bad_hash'"
+        )
 
-    assert post_live_metrics("start", "bad_hash", "fooname", "fooclient") is None
-    assert caplog.records[0].message == (
-        "expected a length 40 commit sha for dictionary value @ "
-        "data['baseline_sha']. Got 'bad_hash'"
-    )
 
-
-def test_post_live_metrics_start_event(mocker, caplog, monkeypatch):
+def test_post_live_metrics_start_event(mocker, monkeypatch):
     monkeypatch.setenv(STUDIO_ENDPOINT, "https://0.0.0.0")
     monkeypatch.setenv(STUDIO_TOKEN, "FOO_TOKEN")
     monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
-    caplog.set_level(logging.DEBUG)
 
     mocked_response = mocker.MagicMock()
     mocked_response.status_code = 200
@@ -118,19 +114,17 @@ def test_post_live_metrics_start_event(mocker, caplog, monkeypatch):
     )
 
 
-def test_post_live_metrics_data_skip_if_no_step(mocker, caplog, monkeypatch):
+def test_post_live_metrics_data_skip_if_no_step(caplog, monkeypatch):
     monkeypatch.setenv(STUDIO_TOKEN, "FOO_TOKEN")
     monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
-    caplog.set_level(logging.DEBUG)
 
     assert post_live_metrics("data", "f" * 40, "fooname", "fooclient") is None
     assert caplog.records[0].message == ("Missing `step` in `data` event.")
 
 
-def test_post_live_metrics_data(mocker, caplog, monkeypatch):
+def test_post_live_metrics_data(mocker, monkeypatch):
     monkeypatch.setenv(STUDIO_TOKEN, "FOO_TOKEN")
     monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
-    caplog.set_level(logging.DEBUG)
 
     mocked_response = mocker.MagicMock()
     mocked_response.status_code = 200
@@ -211,10 +205,9 @@ def test_post_live_metrics_data(mocker, caplog, monkeypatch):
     )
 
 
-def test_post_live_metrics_done(mocker, caplog, monkeypatch):
+def test_post_live_metrics_done(mocker, monkeypatch):
     monkeypatch.setenv(STUDIO_TOKEN, "FOO_TOKEN")
     monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
-    caplog.set_level(logging.DEBUG)
 
     mocked_response = mocker.MagicMock()
     mocked_response.status_code = 200

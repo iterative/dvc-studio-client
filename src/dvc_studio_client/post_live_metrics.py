@@ -9,10 +9,17 @@ from requests.exceptions import RequestException
 from voluptuous import Invalid, MultipleInvalid
 from voluptuous.humanize import humanize_error
 
-from .env import STUDIO_ENDPOINT, STUDIO_REPO_URL, STUDIO_TOKEN
+from .env import (
+    DVC_STUDIO_CLIENT_LOGLEVEL,
+    STUDIO_ENDPOINT,
+    STUDIO_REPO_URL,
+    STUDIO_TOKEN,
+)
 from .schema import SCHEMAS_BY_TYPE
 
+logging.basicConfig()
 logger = logging.getLogger(__name__)
+logger.setLevel(getenv(DVC_STUDIO_CLIENT_LOGLEVEL, "INFO").upper())
 
 
 def _get_remote_url(git_repo):
@@ -157,7 +164,7 @@ def post_live_metrics(
     try:
         SCHEMAS_BY_TYPE[event_type](body)
     except (Invalid, MultipleInvalid) as e:
-        logger.debug(humanize_error(body, e))
+        logger.warning(humanize_error(body, e))
         return None
 
     logger.info(f"post_studio_live_metrics `{event_type=}`")
