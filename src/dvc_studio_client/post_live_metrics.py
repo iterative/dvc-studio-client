@@ -17,7 +17,6 @@ from .env import (
 )
 from .schema import SCHEMAS_BY_TYPE
 
-logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(getenv(DVC_STUDIO_CLIENT_LOGLEVEL, "INFO").upper())
 
