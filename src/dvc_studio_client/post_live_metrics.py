@@ -166,7 +166,7 @@ def post_live_metrics(
         logger.warning(humanize_error(body, e))
         return None
 
-    logger.info(f"post_studio_live_metrics `{event_type=}`")
+    logger.debug(f"post_studio_live_metrics `{event_type=}`")
     logger.debug(f"JSON body `{body=}`")
 
     try:
