@@ -1,4 +1,5 @@
 import logging
+from functools import lru_cache
 from os import getenv
 from typing import Any, Dict, Literal, Optional
 
@@ -25,6 +26,7 @@ def _get_remote_url(git_repo):
     return git_repo.git.ls_remote("--get-url")
 
 
+@lru_cache(maxsize=1)
 def get_studio_repo_url() -> Optional[str]:
     studio_url = None
     try:
