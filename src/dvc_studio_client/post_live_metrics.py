@@ -4,8 +4,6 @@ from os import getenv
 from typing import Any, Dict, Literal, Optional
 
 import requests
-from git import Repo
-from git.exc import GitError
 from requests.exceptions import RequestException
 from voluptuous import Invalid, MultipleInvalid
 from voluptuous.humanize import humanize_error
@@ -22,26 +20,29 @@ logger = logging.getLogger(__name__)
 logger.setLevel(getenv(DVC_STUDIO_CLIENT_LOGLEVEL, "INFO").upper())
 
 
-def _get_remote_url(git_repo):
-    return git_repo.git.ls_remote("--get-url")
+def _get_remote_url() -> str:
+    from dulwich.porcelain import get_remote_repo
+    from dulwich.repo import Repo
+
+    with Repo.discover() as repo:
+        _remote, url = get_remote_repo(repo)
+        return url
 
 
 @lru_cache(maxsize=1)
 def get_studio_repo_url() -> Optional[str]:
-    studio_url = None
+    from dulwich.errors import NotGitRepository
+
     try:
-        git_repo = Repo()
-        studio_url = _get_remote_url(git_repo)
-    except GitError:
-        logger.debug("Tried to find remote url for the active branch but failed.\n")
-    finally:
-        if not studio_url:
-            logger.warning(
-                "Couldn't find a valid Studio Repo URL.\n"
-                "You can try manually setting the environment variable "
-                f"`{STUDIO_REPO_URL}`."
-            )
-        return studio_url  # noqa: B012  # pylint:disable=lost-exception
+        return _get_remote_url()
+    except (NotGitRepository, IndexError):
+        # IndexError happens when the head is detached
+        logger.warning(
+            "Couldn't find a valid Studio Repo URL.\n"
+            "You can try manually setting the environment variable `%s`.",
+            STUDIO_REPO_URL,
+        )
+        return None
 
 
 def get_studio_token_and_repo_url():

@@ -1,40 +1,23 @@
 import logging
+import os
 
+from dulwich.porcelain import clone, init
 from requests import RequestException
 
 from dvc_studio_client.env import STUDIO_ENDPOINT, STUDIO_REPO_URL, STUDIO_TOKEN
 from dvc_studio_client.post_live_metrics import (
     _get_remote_url,
-    get_studio_repo_url,
     get_studio_token_and_repo_url,
     post_live_metrics,
 )
 
 
-def test_get_remote_url(tmpdir):
-    from git import Repo
-
-    repo = Repo.clone_from("https://github.com/iterative/dvclive.git", tmpdir)
-    assert _get_remote_url(repo) == "https://github.com/iterative/dvclive.git"
-
-
-def test_get_studio_repo_url(caplog, mocker):
-    from git.exc import GitError
-
-    mocker.patch(
-        "dvc_studio_client.post_live_metrics._get_remote_url",
-        side_effect=GitError(),
-    )
-    with caplog.at_level(logging.DEBUG, logger="dvc_studio_client.post_live_metrics"):
-        get_studio_repo_url()
-        assert caplog.records[0].message == (
-            "Tried to find remote url for the active branch but failed.\n"
-        )
-        assert caplog.records[1].message == (
-            "Couldn't find a valid Studio Repo URL.\n"
-            "You can try manually setting the environment variable "
-            f"`{STUDIO_REPO_URL}`."
-        )
+def test_get_url(monkeypatch, tmp_path_factory):
+    source = os.fspath(tmp_path_factory.mktemp("source"))
+    target = os.fspath(tmp_path_factory.mktemp("target"))
+    with init(source), clone(source, target):
+        monkeypatch.chdir(target)
+        assert _get_remote_url() == source
 
 
 def test_post_live_metrics_skip_on_missing_token(caplog):
