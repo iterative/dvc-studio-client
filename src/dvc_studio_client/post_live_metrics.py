@@ -25,7 +25,11 @@ def _get_remote_url() -> str:
     from dulwich.repo import Repo
 
     with Repo.discover() as repo:
-        _remote, url = get_remote_repo(repo)
+        try:
+            _remote, url = get_remote_repo(repo)
+        except IndexError:
+            # detached HEAD
+            _remote, url = get_remote_repo(repo, b"origin")
         return url
 
 
