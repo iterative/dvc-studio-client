@@ -28,7 +28,7 @@ def _get_remote_url() -> str:
         try:
             _remote, url = get_remote_repo(repo)
         except IndexError:
-            # detached HEAD
+            # IndexError happens when the head is detached
             _remote, url = get_remote_repo(repo, b"origin")
         return url
 
@@ -39,8 +39,7 @@ def get_studio_repo_url() -> Optional[str]:
 
     try:
         return _get_remote_url()
-    except (NotGitRepository, IndexError):
-        # IndexError happens when the head is detached
+    except NotGitRepository:
         logger.warning(
             "Couldn't find a valid Studio Repo URL.\n"
             "You can try manually setting the environment variable `%s`.",
