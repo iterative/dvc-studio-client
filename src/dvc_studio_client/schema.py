@@ -1,4 +1,4 @@
-from voluptuous import All, Any, Lower, Match, Required, Schema, Exclusive, Optional
+from voluptuous import All, Any, Exclusive, Lower, Match, Required, Schema
 
 
 def Choices(*choices):
@@ -32,11 +32,16 @@ SCHEMAS_BY_TYPE = {
     "data": BASE_SCHEMA.extend(
         {
             Required("step"): int,
-            "plots": {str: {
-                Exclusive("data", "data"): [dict],
-                "props": dict, "error": ERROR_SCHEMA,
-                Exclusive("image", "data"): str
-            }},
+            "plots": {
+                str: {
+                    Exclusive("data", "data"): [dict],
+                    "props": dict,
+                    "error": ERROR_SCHEMA,
+                    Exclusive("images", "data"): [
+                        dict
+                    ],  # {step: image} content dictionary
+                }
+            },
         }
     ),
     "done": BASE_SCHEMA.extend(
