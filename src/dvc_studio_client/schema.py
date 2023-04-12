@@ -37,9 +37,7 @@ SCHEMAS_BY_TYPE = {
                     Exclusive("data", "data"): [dict],
                     "props": dict,
                     "error": ERROR_SCHEMA,
-                    Exclusive("images", "data"): [
-                        dict
-                    ],  # {step: image} content dictionary
+                    Exclusive("image", "data"): str,
                 }
             },
         }
