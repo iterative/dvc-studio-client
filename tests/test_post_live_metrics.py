@@ -1,10 +1,16 @@
 import logging
 import os
 
+import pytest
 from dulwich.porcelain import clone, init
 from requests import RequestException
 
-from dvc_studio_client.env import STUDIO_ENDPOINT, STUDIO_REPO_URL, STUDIO_TOKEN
+from dvc_studio_client.env import (
+    DVC_STUDIO_TOKEN,
+    DVC_STUDIO_URL,
+    STUDIO_REPO_URL,
+    STUDIO_TOKEN,
+)
 from dvc_studio_client.post_live_metrics import (
     _get_remote_url,
     get_studio_token_and_repo_url,
@@ -20,16 +26,23 @@ def test_get_url(monkeypatch, tmp_path_factory):
         assert _get_remote_url() == source
 
 
+@pytest.mark.parametrize("var", [DVC_STUDIO_TOKEN, STUDIO_TOKEN])
+def test_studio_token_envvar(monkeypatch, var):
+    monkeypatch.setenv(var, "FOO_TOKEN")
+    monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
+    assert get_studio_token_and_repo_url() == ("FOO_TOKEN", "FOO_REPO_URL")
+
+
 def test_post_live_metrics_skip_on_missing_token(caplog):
     with caplog.at_level(logging.DEBUG, logger="dvc_studio_client.post_live_metrics"):
         assert post_live_metrics("start", "current_rev", "fooname", "fooclient") is None
         assert caplog.records[0].message == (
-            "STUDIO_TOKEN not found. Skipping `post_studio_live_metrics`"
+            "DVC_STUDIO_TOKEN not found. Skipping `post_studio_live_metrics`"
         )
 
 
 def test_post_live_metrics_skip_on_schema_error(caplog, monkeypatch):
-    monkeypatch.setenv(STUDIO_TOKEN, "FOO_TOKEN")
+    monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
     monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
     with caplog.at_level(logging.DEBUG, logger="dvc_studio_client.post_live_metrics"):
         assert post_live_metrics("start", "bad_hash", "fooname", "fooclient") is None
@@ -40,8 +53,8 @@ def test_post_live_metrics_skip_on_schema_error(caplog, monkeypatch):
 
 
 def test_post_live_metrics_start_event(mocker, monkeypatch):
-    monkeypatch.setenv(STUDIO_ENDPOINT, "https://0.0.0.0")
-    monkeypatch.setenv(STUDIO_TOKEN, "FOO_TOKEN")
+    monkeypatch.setenv(DVC_STUDIO_URL, "https://0.0.0.0")
+    monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
     monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
 
     mocked_response = mocker.MagicMock()
@@ -56,7 +69,7 @@ def test_post_live_metrics_start_event(mocker, monkeypatch):
     )
 
     mocked_post.assert_called_with(
-        "https://0.0.0.0",
+        "https://0.0.0.0/api/live",
         json={
             "type": "start",
             "repo_url": "FOO_REPO_URL",
@@ -80,7 +93,7 @@ def test_post_live_metrics_start_event(mocker, monkeypatch):
     )
 
     mocked_post.assert_called_with(
-        "https://0.0.0.0",
+        "https://0.0.0.0/api/live",
         json={
             "type": "start",
             "repo_url": "FOO_REPO_URL",
@@ -98,7 +111,7 @@ def test_post_live_metrics_start_event(mocker, monkeypatch):
 
 
 def test_post_live_metrics_data_skip_if_no_step(caplog, monkeypatch):
-    monkeypatch.setenv(STUDIO_TOKEN, "FOO_TOKEN")
+    monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
     monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
 
     assert post_live_metrics("data", "f" * 40, "fooname", "fooclient") is None
@@ -106,7 +119,7 @@ def test_post_live_metrics_data_skip_if_no_step(caplog, monkeypatch):
 
 
 def test_post_live_metrics_data(mocker, monkeypatch):
-    monkeypatch.setenv(STUDIO_TOKEN, "FOO_TOKEN")
+    monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
     monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
 
     mocked_response = mocker.MagicMock()
@@ -189,7 +202,7 @@ def test_post_live_metrics_data(mocker, monkeypatch):
 
 
 def test_post_live_metrics_done(mocker, monkeypatch):
-    monkeypatch.setenv(STUDIO_TOKEN, "FOO_TOKEN")
+    monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
     monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
 
     mocked_response = mocker.MagicMock()
@@ -264,7 +277,7 @@ def test_post_live_metrics_done(mocker, monkeypatch):
 
 
 def test_post_live_metrics_bad_response(mocker, monkeypatch):
-    monkeypatch.setenv(STUDIO_TOKEN, "FOO_TOKEN")
+    monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
     monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
 
     mocked_response = mocker.MagicMock()
