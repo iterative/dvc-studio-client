@@ -629,15 +629,8 @@ Defaults to <code>None</code>.</p></td>
   </table>
 
       <details class="quote">
-        <summary>Source code in <code>/opt/hostedtoolcache/Python/3.10.10/x64/lib/python3.10/site-packages/dvc_studio_client/post_live_metrics.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 64</span>
-<span class="normal"> 65</span>
-<span class="normal"> 66</span>
-<span class="normal"> 67</span>
-<span class="normal"> 68</span>
-<span class="normal"> 69</span>
-<span class="normal"> 70</span>
-<span class="normal"> 71</span>
+        <summary>Source code in <code>/opt/hostedtoolcache/Python/3.10.11/x64/lib/python3.10/site-packages/dvc_studio_client/post_live_metrics.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 71</span>
 <span class="normal"> 72</span>
 <span class="normal"> 73</span>
 <span class="normal"> 74</span>
@@ -762,7 +755,17 @@ Defaults to <code>None</code>.</p></td>
 <span class="normal">193</span>
 <span class="normal">194</span>
 <span class="normal">195</span>
-<span class="normal">196</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">post_live_metrics</span><span class="p">(</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">post_live_metrics</span><span class="p">(</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;done&quot;</span><span class="p">],</span>
     <span class="n">baseline_sha</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -876,9 +879,12 @@ Defaults to <code>None</code>.</p></td>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;post_studio_live_metrics `</span><span class="si">{</span><span class="n">event_type</span><span class="si">=}</span><span class="s2">`&quot;</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;JSON body `</span><span class="si">{</span><span class="n">body</span><span class="si">=}</span><span class="s2">`&quot;</span><span class="p">)</span>
 
+    <span class="n">base_url</span> <span class="o">=</span> <span class="n">getenv</span><span class="p">(</span><span class="n">DVC_STUDIO_URL</span><span class="p">)</span> <span class="ow">or</span> <span class="n">STUDIO_URL</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">getenv</span><span class="p">(</span><span class="n">STUDIO_ENDPOINT</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;api/live&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">base_url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
-            <span class="n">getenv</span><span class="p">(</span><span class="n">STUDIO_ENDPOINT</span><span class="p">,</span> <span class="s2">&quot;https://studio.iterative.ai/api/live&quot;</span><span class="p">),</span>
+            <span class="n">url</span><span class="p">,</span>
             <span class="n">json</span><span class="o">=</span><span class="n">body</span><span class="p">,</span>
             <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
                 <span class="s2">&quot;Content-type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
