@@ -4,7 +4,7 @@ import os
 from dulwich.porcelain import clone, init
 from requests import RequestException
 
-from dvc_studio_client.env import STUDIO_ENDPOINT, STUDIO_REPO_URL, STUDIO_TOKEN
+from dvc_studio_client.env import DVC_STUDIO_URL, STUDIO_REPO_URL, STUDIO_TOKEN
 from dvc_studio_client.post_live_metrics import (
     _get_remote_url,
     get_studio_token_and_repo_url,
@@ -98,7 +98,7 @@ def test_post_live_metrics_start_event(mocker, monkeypatch):
 
 
 def test_post_live_metrics_start_event_machine(mocker, monkeypatch):
-    monkeypatch.setenv(STUDIO_ENDPOINT, "https://0.0.0.0")
+    monkeypatch.setenv(DVC_STUDIO_URL, "https://0.0.0.0")
     monkeypatch.setenv(STUDIO_TOKEN, "FOO_TOKEN")
     monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
 
