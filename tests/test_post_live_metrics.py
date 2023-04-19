@@ -5,7 +5,6 @@ import pytest
 from dulwich.porcelain import clone, init
 from requests import RequestException
 
-
 from dvc_studio_client.env import (
     DVC_STUDIO_TOKEN,
     DVC_STUDIO_URL,
@@ -130,7 +129,7 @@ def test_post_live_metrics_start_event_machine(mocker, monkeypatch):
     )
 
     mocked_post.assert_called_with(
-        "https://0.0.0.0",
+        "https://0.0.0.0/api/live",
         json={
             "type": "start",
             "repo_url": "FOO_REPO_URL",
