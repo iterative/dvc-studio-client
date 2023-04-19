@@ -2,6 +2,7 @@ import logging
 from functools import lru_cache
 from os import getenv
 from typing import Any, Dict, Literal, Optional
+from urllib.parse import urljoin
 
 import requests
 from requests.exceptions import RequestException
@@ -10,11 +11,15 @@ from voluptuous.humanize import humanize_error
 
 from .env import (
     DVC_STUDIO_CLIENT_LOGLEVEL,
+    DVC_STUDIO_TOKEN,
+    DVC_STUDIO_URL,
     STUDIO_ENDPOINT,
     STUDIO_REPO_URL,
     STUDIO_TOKEN,
 )
 from .schema import SCHEMAS_BY_TYPE
+
+STUDIO_URL = "https://studio.iterative.ai"
 
 logger = logging.getLogger(__name__)
 logger.setLevel(getenv(DVC_STUDIO_CLIENT_LOGLEVEL, "INFO").upper())
@@ -49,9 +54,11 @@ def get_studio_repo_url() -> Optional[str]:
 
 
 def get_studio_token_and_repo_url():
-    studio_token = getenv(STUDIO_TOKEN, None)
+    studio_token = getenv(DVC_STUDIO_TOKEN) or getenv(STUDIO_TOKEN)
     if studio_token is None:
-        logger.debug("STUDIO_TOKEN not found. Skipping `post_studio_live_metrics`")
+        logger.debug(
+            f"{DVC_STUDIO_TOKEN} not found. Skipping `post_studio_live_metrics`"
+        )
         return None, None
 
     studio_repo_url = getenv(STUDIO_REPO_URL, None)
@@ -190,9 +197,12 @@ def post_live_metrics(
     logger.debug(f"post_studio_live_metrics `{event_type=}`")
     logger.debug(f"JSON body `{body=}`")
 
+    base_url = getenv(DVC_STUDIO_URL) or STUDIO_URL
+    path = getenv(STUDIO_ENDPOINT) or "api/live"
+    url = urljoin(base_url, path)
     try:
         response = requests.post(
-            getenv(STUDIO_ENDPOINT, "https://studio.iterative.ai/api/live"),
+            url,
             json=body,
             headers={
                 "Content-type": "application/json",
