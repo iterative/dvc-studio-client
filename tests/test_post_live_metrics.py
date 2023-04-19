@@ -5,14 +5,12 @@ import pytest
 from dulwich.porcelain import clone, init
 from requests import RequestException
 
-
 from dvc_studio_client.env import (
     DVC_STUDIO_TOKEN,
     DVC_STUDIO_URL,
     STUDIO_REPO_URL,
     STUDIO_TOKEN,
 )
-
 from dvc_studio_client.post_live_metrics import (
     _get_remote_url,
     get_studio_token_and_repo_url,
