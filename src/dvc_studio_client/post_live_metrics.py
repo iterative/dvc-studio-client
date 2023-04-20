@@ -53,15 +53,15 @@ def get_studio_repo_url() -> Optional[str]:
         return None
 
 
-def get_studio_token_and_repo_url():
-    studio_token = getenv(DVC_STUDIO_TOKEN) or getenv(STUDIO_TOKEN)
+def get_studio_token_and_repo_url(studio_token=None, studio_repo_url=None):
+    studio_token = studio_token or getenv(DVC_STUDIO_TOKEN) or getenv(STUDIO_TOKEN)
     if studio_token is None:
         logger.debug(
             f"{DVC_STUDIO_TOKEN} not found. Skipping `post_studio_live_metrics`"
         )
         return None, None
 
-    studio_repo_url = getenv(STUDIO_REPO_URL, None)
+    studio_repo_url = studio_repo_url or getenv(STUDIO_REPO_URL, None)
     if studio_repo_url is None:
         logger.debug(f"`{STUDIO_REPO_URL}` not found. Trying to automatically find it.")
         studio_repo_url = get_studio_repo_url()
@@ -78,6 +78,8 @@ def post_live_metrics(
     params: Optional[Dict[str, Any]] = None,
     plots: Optional[Dict[str, Any]] = None,
     step: Optional[int] = None,
+    studio_token: Optional[str] = None,
+    studio_repo_url: Optional[str] = None,
 ) -> Optional[bool]:
     """Post `event_type` to Studio's `api/live`.
 
@@ -131,14 +133,18 @@ def post_live_metrics(
             Usually comes from DVCLive `Live.step` property.
             Required in when `event_type="data"`.
             Defaults to `None`.
-
+        studio_token (Optional[str]): Studio access token obtained from the UI.
+        studio_repo_url (Optional[str]): URL of the Git repository that has been
+            imported into Studio UI.
     Returns:
         Optional[bool]:
             `True` - if received status code 200 from Studio.
             `False` - if received other status code or RequestException raised.
             `None`- if prerequisites weren't met and the request was not sent.
     """
-    studio_token, studio_repo_url = get_studio_token_and_repo_url()
+    studio_token, studio_repo_url = get_studio_token_and_repo_url(
+        studio_token, studio_repo_url
+    )
 
     if any(x is None for x in (studio_token, studio_repo_url)):
         return None
