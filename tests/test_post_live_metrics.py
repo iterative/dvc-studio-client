@@ -345,3 +345,36 @@ def test_get_studio_token_and_repo_url_skip_repo_url(monkeypatch):
     token, repo_url = get_studio_token_and_repo_url()
     assert token is None
     assert repo_url is None  # Skipped call to get_repo_url
+
+
+def test_post_live_metrics_token_and_repo_url_args(mocker, monkeypatch):
+    monkeypatch.setenv(DVC_STUDIO_URL, "https://0.0.0.0")
+
+    mocked_response = mocker.MagicMock()
+    mocked_response.status_code = 200
+    mocked_post = mocker.patch("requests.post", return_value=mocked_response)
+
+    assert post_live_metrics(
+        "start",
+        "f" * 40,
+        "fooname",
+        "fooclient",
+        studio_token="FOO_TOKEN",
+        studio_repo_url="FOO_REPO_URL",
+    )
+
+    mocked_post.assert_called_with(
+        "https://0.0.0.0/api/live",
+        json={
+            "type": "start",
+            "repo_url": "FOO_REPO_URL",
+            "baseline_sha": "f" * 40,
+            "name": "fooname",
+            "client": "fooclient",
+        },
+        headers={
+            "Authorization": "token FOO_TOKEN",
+            "Content-type": "application/json",
+        },
+        timeout=5,
+    )
