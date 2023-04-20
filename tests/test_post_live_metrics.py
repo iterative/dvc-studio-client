@@ -110,6 +110,41 @@ def test_post_live_metrics_start_event(mocker, monkeypatch):
     )
 
 
+def test_post_live_metrics_start_event_machine(mocker, monkeypatch):
+    monkeypatch.setenv(DVC_STUDIO_URL, "https://0.0.0.0")
+    monkeypatch.setenv(STUDIO_TOKEN, "FOO_TOKEN")
+    monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
+
+    mocked_response = mocker.MagicMock()
+    mocked_response.status_code = 200
+    mocked_post = mocker.patch("requests.post", return_value=mocked_response)
+
+    assert post_live_metrics(
+        "start",
+        "f" * 40,
+        "fooname",
+        "fooclient",
+        machine={"cpu": 1, "gpu": 2},
+    )
+
+    mocked_post.assert_called_with(
+        "https://0.0.0.0/api/live",
+        json={
+            "type": "start",
+            "repo_url": "FOO_REPO_URL",
+            "baseline_sha": "f" * 40,
+            "name": "fooname",
+            "client": "fooclient",
+            "machine": {"cpu": 1, "gpu": 2},
+        },
+        headers={
+            "Authorization": "token FOO_TOKEN",
+            "Content-type": "application/json",
+        },
+        timeout=5,
+    )
+
+
 def test_post_live_metrics_data_skip_if_no_step(caplog, monkeypatch):
     monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
     monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")

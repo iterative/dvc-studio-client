@@ -24,6 +24,7 @@ BASE_SCHEMA = Schema(
         "errors": [ERROR_SCHEMA],
         "params": {str: dict},
         "metrics": {str: {"data": dict, "error": ERROR_SCHEMA}},
+        "machine": dict,
         # Required("timestamp"): iso_datetime,  # TODO: decide if we need this
     }
 )

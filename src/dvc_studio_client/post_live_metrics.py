@@ -74,6 +74,7 @@ def post_live_metrics(
     name: str,
     client: Literal["dvc", "dvclive"],
     experiment_rev: Optional[str] = None,
+    machine: Optional[Dict[str, Any]] = None,
     metrics: Optional[Dict[str, Any]] = None,
     params: Optional[Dict[str, Any]] = None,
     plots: Optional[Dict[str, Any]] = None,
@@ -96,6 +97,17 @@ def post_live_metrics(
             the experiment.
             Only used when `event_type="done"`.
             Only used when
+        machine (Optional[Dict[str, Any]]): Information about the machine
+            running the experiment.
+            Defaults to `None`.
+            ```
+            machine={
+                "cpu": 0.94
+                "memory": 0.99
+                "cloud": "aws"
+                "instance": "t2.micro"
+            }
+            ```
         metrics (Optional[Dict[str, Any]]): Updates to DVC metric files.
             Defaults to `None`.
             Only used when `event_type="data"`.
@@ -156,6 +168,9 @@ def post_live_metrics(
 
     if metrics:
         body["metrics"] = metrics
+
+    if machine:
+        body["machine"] = machine
 
     if event_type == "data":
         if step is None:
