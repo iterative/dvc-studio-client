@@ -378,3 +378,64 @@ def test_post_live_metrics_token_and_repo_url_args(mocker, monkeypatch):
         },
         timeout=5,
     )
+
+
+def test_post_live_metrics_message(mocker, monkeypatch):
+    monkeypatch.setenv(DVC_STUDIO_URL, "https://0.0.0.0")
+    monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
+    monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
+
+    mocked_response = mocker.MagicMock()
+    mocked_response.status_code = 200
+    mocked_post = mocker.patch("requests.post", return_value=mocked_response)
+
+    assert post_live_metrics(
+        "start",
+        "f" * 40,
+        "fooname",
+        "fooclient",
+        message="FOO_MESSAGE",
+    )
+
+    mocked_post.assert_called_with(
+        "https://0.0.0.0/api/live",
+        json={
+            "type": "start",
+            "repo_url": "FOO_REPO_URL",
+            "baseline_sha": "f" * 40,
+            "name": "fooname",
+            "client": "fooclient",
+            "message": "FOO_MESSAGE",
+        },
+        headers={
+            "Authorization": "token FOO_TOKEN",
+            "Content-type": "application/json",
+        },
+        timeout=5,
+    )
+
+    # Test message length limit
+    assert post_live_metrics(
+        "start",
+        "f" * 40,
+        "fooname",
+        "fooclient",
+        message="X" * 100,
+    )
+
+    mocked_post.assert_called_with(
+        "https://0.0.0.0/api/live",
+        json={
+            "type": "start",
+            "repo_url": "FOO_REPO_URL",
+            "baseline_sha": "f" * 40,
+            "name": "fooname",
+            "client": "fooclient",
+            "message": "X" * 72,
+        },
+        headers={
+            "Authorization": "token FOO_TOKEN",
+            "Content-type": "application/json",
+        },
+        timeout=5,
+    )

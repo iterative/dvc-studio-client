@@ -29,7 +29,11 @@ BASE_SCHEMA = Schema(
     }
 )
 SCHEMAS_BY_TYPE = {
-    "start": BASE_SCHEMA,
+    "start": BASE_SCHEMA.extend(
+        {
+            "message": str,
+        }
+    ),
     "data": BASE_SCHEMA.extend(
         {
             Required("step"): int,
