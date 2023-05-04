@@ -68,13 +68,14 @@ def get_studio_token_and_repo_url(studio_token=None, studio_repo_url=None):
     return studio_token, studio_repo_url
 
 
-def post_live_metrics(
+def post_live_metrics(  # noqa: C901
     event_type: Literal["start", "data", "done"],
     baseline_sha: str,
     name: str,
     client: Literal["dvc", "dvclive"],
     experiment_rev: Optional[str] = None,
     machine: Optional[Dict[str, Any]] = None,
+    message: Optional[str] = None,
     metrics: Optional[Dict[str, Any]] = None,
     params: Optional[Dict[str, Any]] = None,
     plots: Optional[Dict[str, Any]] = None,
@@ -110,6 +111,8 @@ def post_live_metrics(
                 "instance": "t2.micro"
             }
             ```
+        message: (Optional[str]): Custom message to be displayed as the commit
+            message in Studio UI.
         metrics (Optional[Dict[str, Any]]): Updates to DVC metric files.
             Defaults to `None`.
             Only used when `event_type="data"`.
@@ -178,7 +181,11 @@ def post_live_metrics(
     if machine:
         body["machine"] = machine
 
-    if event_type == "data":
+    if event_type == "start":
+        if message:
+            # Cutting the message to match the commit title length limit.
+            body["message"] = message[:72]
+    elif event_type == "data":
         if step is None:
             logger.warning("Missing `step` in `data` event.")
             return None
