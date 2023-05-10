@@ -43,10 +43,10 @@ def test_studio_config_envvar(monkeypatch, token, repo_url):
     }
 
 
-def test_studio_config_dvc_config(monkeypatch):
-    monkeypatch.setenv(DVC_STUDIO_REPO_URL, "FOO_REPO_URL")
+def test_studio_config_dvc_config():
     dvc_config = {
         "token": "FOO_TOKEN",
+        "repo_url": "FOO_REPO_URL",
         "url": "FOO_URL",
     }
     expected = {

@@ -119,7 +119,10 @@ def get_studio_config(
     config["studio_token"] = studio_token
 
     studio_repo_url = (
-        studio_repo_url or getenv(DVC_STUDIO_REPO_URL) or getenv(STUDIO_REPO_URL)
+        studio_repo_url
+        or getenv(DVC_STUDIO_REPO_URL)
+        or getenv(STUDIO_REPO_URL)
+        or dvc_config.get("repo_url")
     )
     if studio_repo_url is None:
         logger.debug(
