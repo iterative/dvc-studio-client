@@ -58,17 +58,11 @@ def get_studio_repo_url() -> Optional[str]:
 
 def get_studio_token_and_repo_url(studio_token=None, studio_repo_url=None):
     studio_token = studio_token or getenv(DVC_STUDIO_TOKEN) or getenv(STUDIO_TOKEN)
-    if studio_token is None:
-        logger.debug(
-            f"{DVC_STUDIO_TOKEN} not found. Skipping `post_studio_live_metrics`"
-        )
-        return None, None
-
-    studio_repo_url = studio_repo_url or getenv(STUDIO_REPO_URL, None)
-    if studio_repo_url is None:
-        logger.debug(f"`{STUDIO_REPO_URL}` not found. Trying to automatically find it.")
-        studio_repo_url = get_studio_repo_url()
-    return studio_token, studio_repo_url
+    """Get studio token and repo_url. Kept for backwards compatibility."""
+    config = get_studio_config(
+        studio_token=studio_token, studio_repo_url=studio_repo_url
+    )
+    return config["token"], config["repo_url"]
 
 
 def get_studio_config(
@@ -100,7 +94,7 @@ def get_studio_config(
     def to_bool(var):
         if var is None:
             return False
-        return bool(re.search("1|y|yes|true", var, flags=re.I))
+        return bool(re.search("1|y|yes|true", str(var), flags=re.I))
 
     offline = (
         offline
