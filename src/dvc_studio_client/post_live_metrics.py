@@ -66,16 +66,16 @@ def get_studio_token_and_repo_url(studio_token=None, studio_repo_url=None):
 
 
 def get_studio_config(
-    dvc_config: Optional[Dict[str, Any]] = None,
+    dvc_studio_config: Optional[Dict[str, Any]] = None,
     offline: bool = False,
     studio_token: Optional[str] = None,
     studio_repo_url: Optional[str] = None,
     studio_url: Optional[str] = None,
-) -> Dict:
+) -> Dict[str, Any]:
     """Get studio config options.
 
     Args:
-        dvc_config (Optional[dict]): Dict returned by dvc.Repo.config["studio"].
+        dvc_studio_config (Optional[dict]): Dict returned by dvc.Repo.config["studio"].
         offline (bool): Whether offline mode is enabled. Default: false.
         studio_token (Optional[str]): Studio access token obtained from the UI.
         studio_repo_url (Optional[str]): URL of the Git repository that has been
@@ -84,12 +84,18 @@ def get_studio_config(
     Returns:
         Dict:
             Config options for posting live metrics.
-            Keys match the DVC_STUDIO... environment variables.
+            Keys match the DVC studio config section.
+            Example:
+                {
+                    "token": "mytoken",
+                    "repo_url": "git@github.com:iterative/dvc-studio-client.git",
+                    "url": "https://studio.iterative.ai",
+                }
     """
 
     config = {}
-    if not dvc_config:
-        dvc_config = {}
+    if not dvc_studio_config:
+        dvc_studio_config = {}
 
     def to_bool(var):
         if var is None:
@@ -99,7 +105,7 @@ def get_studio_config(
     offline = (
         offline
         or to_bool(getenv(DVC_STUDIO_OFFLINE))
-        or to_bool(dvc_config.get("offline"))
+        or to_bool(dvc_studio_config.get("offline"))
     )
     if offline:
         logger.debug("Offline mode enabled. Skipping `post_studio_live_metrics`")
@@ -109,20 +115,20 @@ def get_studio_config(
         studio_token
         or getenv(DVC_STUDIO_TOKEN)
         or getenv(STUDIO_TOKEN)
-        or dvc_config.get("token")
+        or dvc_studio_config.get("token")
     )
     if not studio_token:
         logger.debug(
             f"{DVC_STUDIO_TOKEN} not found. Skipping `post_studio_live_metrics`"
         )
         return {}
-    config["studio_token"] = studio_token
+    config["token"] = studio_token
 
     studio_repo_url = (
         studio_repo_url
         or getenv(DVC_STUDIO_REPO_URL)
         or getenv(STUDIO_REPO_URL)
-        or dvc_config.get("repo_url")
+        or dvc_studio_config.get("repo_url")
     )
     if studio_repo_url is None:
         logger.debug(
@@ -130,19 +136,19 @@ def get_studio_config(
         )
         studio_repo_url = get_studio_repo_url()
     if studio_repo_url:
-        config["studio_repo_url"] = studio_repo_url
+        config["repo_url"] = studio_repo_url
     else:
         logger.debug(
             f"{DVC_STUDIO_REPO_URL} not found. Skipping `post_studio_live_metrics`"
         )
         return {}
 
-    studio_url = studio_url or getenv(DVC_STUDIO_URL) or dvc_config.get("url")
+    studio_url = studio_url or getenv(DVC_STUDIO_URL) or dvc_studio_config.get("url")
     if studio_url:
-        config["studio_url"] = studio_url
+        config["url"] = studio_url
     else:
         logger.debug(f"{DVC_STUDIO_URL} not found. Using {STUDIO_URL}.")
-        config["studio_url"] = STUDIO_URL
+        config["url"] = STUDIO_URL
 
     return config
 
@@ -159,7 +165,7 @@ def post_live_metrics(  # noqa: C901
     params: Optional[Dict[str, Any]] = None,
     plots: Optional[Dict[str, Any]] = None,
     step: Optional[int] = None,
-    dvc_config: Optional[Dict[str, Any]] = None,
+    dvc_studio_config: Optional[Dict[str, Any]] = None,
     offline: bool = False,
     studio_token: Optional[str] = None,
     studio_repo_url: Optional[str] = None,
@@ -230,7 +236,7 @@ def post_live_metrics(  # noqa: C901
             Usually comes from DVCLive `Live.step` property.
             Required in when `event_type="data"`.
             Defaults to `None`.
-        dvc_config (Optional[Dict]): DVC config options for Studio.
+        dvc_studio_config (Optional[Dict]): DVC config options for Studio.
         offline (bool): Whether offline mode is enabled.
         studio_token (Optional[str]): Studio access token obtained from the UI.
         studio_repo_url (Optional[str]): URL of the Git repository that has been
@@ -243,7 +249,7 @@ def post_live_metrics(  # noqa: C901
             `None`- if prerequisites weren't met and the request was not sent.
     """
     config = get_studio_config(
-        dvc_config=dvc_config,
+        dvc_studio_config=dvc_studio_config,
         offline=offline,
         studio_token=studio_token,
         studio_repo_url=studio_repo_url,
@@ -255,7 +261,7 @@ def post_live_metrics(  # noqa: C901
 
     body = {
         "type": event_type,
-        "repo_url": config["studio_repo_url"],
+        "repo_url": config["repo_url"],
         "baseline_sha": baseline_sha,
         "name": name,
         "client": client,
@@ -300,14 +306,14 @@ def post_live_metrics(  # noqa: C901
     logger.debug(f"JSON body `{body=}`")
 
     path = getenv(STUDIO_ENDPOINT) or "api/live"
-    url = urljoin(config["studio_url"], path)
+    url = urljoin(config["url"], path)
     try:
         response = requests.post(
             url,
             json=body,
             headers={
                 "Content-type": "application/json",
-                "Authorization": f"token {config['studio_token']}",
+                "Authorization": f"token {config['token']}",
             },
             timeout=5,
         )

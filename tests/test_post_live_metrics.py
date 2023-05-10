@@ -37,31 +37,31 @@ def test_studio_config_envvar(monkeypatch, token, repo_url):
     monkeypatch.setenv(token, "FOO_TOKEN")
     monkeypatch.setenv(repo_url, "FOO_REPO_URL")
     assert get_studio_config() == {
-        "studio_token": "FOO_TOKEN",
-        "studio_repo_url": "FOO_REPO_URL",
-        "studio_url": STUDIO_URL,
+        "token": "FOO_TOKEN",
+        "repo_url": "FOO_REPO_URL",
+        "url": STUDIO_URL,
     }
 
 
-def test_studio_config_dvc_config():
-    dvc_config = {
+def test_studio_config_dvc_studio_config():
+    dvc_studio_config = {
         "token": "FOO_TOKEN",
         "repo_url": "FOO_REPO_URL",
         "url": "FOO_URL",
     }
     expected = {
-        "studio_token": "FOO_TOKEN",
-        "studio_repo_url": "FOO_REPO_URL",
-        "studio_url": "FOO_URL",
+        "token": "FOO_TOKEN",
+        "repo_url": "FOO_REPO_URL",
+        "url": "FOO_URL",
     }
-    assert get_studio_config(dvc_config=dvc_config) == expected
+    assert get_studio_config(dvc_studio_config=dvc_studio_config) == expected
 
 
 def test_studio_config_kwarg(monkeypatch):
     expected = {
-        "studio_token": "FOO_TOKEN",
-        "studio_repo_url": "FOO_REPO_URL",
-        "studio_url": "FOO_URL",
+        "token": "FOO_TOKEN",
+        "repo_url": "FOO_REPO_URL",
+        "url": "FOO_URL",
     }
     assert (
         get_studio_config(
@@ -77,16 +77,16 @@ def test_studio_config_envvar_override(monkeypatch):
     monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
     monkeypatch.setenv(DVC_STUDIO_URL, "FOO_URL")
     monkeypatch.setenv(DVC_STUDIO_REPO_URL, "FOO_REPO_URL")
-    dvc_config = {
+    dvc_studio_config = {
         "token": "BAR_TOKEN",
         "url": "BAR_URL",
     }
     expected = {
-        "studio_token": "FOO_TOKEN",
-        "studio_repo_url": "FOO_REPO_URL",
-        "studio_url": "FOO_URL",
+        "token": "FOO_TOKEN",
+        "repo_url": "FOO_REPO_URL",
+        "url": "FOO_URL",
     }
-    assert get_studio_config(dvc_config=dvc_config) == expected
+    assert get_studio_config(dvc_studio_config=dvc_studio_config) == expected
 
 
 def test_studio_config_kwarg_override(monkeypatch):
@@ -94,9 +94,9 @@ def test_studio_config_kwarg_override(monkeypatch):
     monkeypatch.setenv(DVC_STUDIO_REPO_URL, "FOO_REPO_URL")
     monkeypatch.setenv(DVC_STUDIO_URL, "FOO_URL")
     expected = {
-        "studio_token": "BAR_TOKEN",
-        "studio_repo_url": "BAR_REPO_URL",
-        "studio_url": "BAR_URL",
+        "token": "BAR_TOKEN",
+        "repo_url": "BAR_REPO_URL",
+        "url": "BAR_URL",
     }
     assert (
         get_studio_config(
@@ -126,14 +126,14 @@ def test_studio_config_offline(monkeypatch, val):
     monkeypatch.setenv(DVC_STUDIO_OFFLINE, val)
     assert get_studio_config() == {}
 
-    assert get_studio_config(dvc_config={"offline": True}) == {}
+    assert get_studio_config(dvc_studio_config={"offline": True}) == {}
 
 
 def test_studio_config_infer_url(monkeypatch):
     monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
     monkeypatch.setenv(DVC_STUDIO_REPO_URL, "FOO_REPO_URL")
 
-    assert get_studio_config()["studio_url"] == STUDIO_URL
+    assert get_studio_config()["url"] == STUDIO_URL
 
 
 def test_post_live_metrics_skip_on_missing_token(caplog):
