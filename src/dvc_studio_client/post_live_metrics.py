@@ -122,7 +122,7 @@ def get_studio_config(
             f"{DVC_STUDIO_TOKEN} not found. Skipping `post_studio_live_metrics`"
         )
         return {}
-     config["studio_token"] = studio_token
+    config["studio_token"] = studio_token
 
     studio_repo_url = (
         studio_repo_url or getenv(DVC_STUDIO_REPO_URL) or getenv(STUDIO_REPO_URL)
