@@ -108,18 +108,22 @@ def test_studio_config_kwarg_override(monkeypatch):
     )
 
 
-def test_studio_config_offline(monkeypatch):
+@pytest.mark.parametrize(
+    "val",
+    ("1", "y", "yes", "true", True, 1),
+)
+def test_studio_config_offline(monkeypatch, val):
     monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
     monkeypatch.setenv(DVC_STUDIO_REPO_URL, "FOO_REPO_URL")
 
     assert get_studio_config() != {}
 
-    assert get_studio_config(offline=True) == {}
+    assert get_studio_config(offline=val) == {}
 
-    monkeypatch.setenv(DVC_STUDIO_OFFLINE, "true")
+    monkeypatch.setenv(DVC_STUDIO_OFFLINE, val)
     assert get_studio_config() == {}
 
-    monkeypatch.setenv(DVC_STUDIO_OFFLINE, "1")
+    monkeypatch.setenv(DVC_STUDIO_OFFLINE, val)
     assert get_studio_config() == {}
 
     assert get_studio_config(dvc_config={"offline": True}) == {}
