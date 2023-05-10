@@ -6,14 +6,17 @@ from dulwich.porcelain import clone, init
 from requests import RequestException
 
 from dvc_studio_client.env import (
+    DVC_STUDIO_OFFLINE,
+    DVC_STUDIO_REPO_URL,
     DVC_STUDIO_TOKEN,
     DVC_STUDIO_URL,
     STUDIO_REPO_URL,
     STUDIO_TOKEN,
 )
 from dvc_studio_client.post_live_metrics import (
+    STUDIO_URL,
     _get_remote_url,
-    get_studio_token_and_repo_url,
+    get_studio_config,
     post_live_metrics,
 )
 
@@ -26,11 +29,107 @@ def test_get_url(monkeypatch, tmp_path_factory):
         assert _get_remote_url() == source
 
 
-@pytest.mark.parametrize("var", [DVC_STUDIO_TOKEN, STUDIO_TOKEN])
-def test_studio_token_envvar(monkeypatch, var):
-    monkeypatch.setenv(var, "FOO_TOKEN")
-    monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
-    assert get_studio_token_and_repo_url() == ("FOO_TOKEN", "FOO_REPO_URL")
+@pytest.mark.parametrize(
+    "token,repo_url",
+    [(DVC_STUDIO_TOKEN, DVC_STUDIO_REPO_URL), (STUDIO_TOKEN, STUDIO_REPO_URL)],
+)
+def test_studio_config_envvar(monkeypatch, token, repo_url):
+    monkeypatch.setenv(token, "FOO_TOKEN")
+    monkeypatch.setenv(repo_url, "FOO_REPO_URL")
+    assert get_studio_config() == {
+        "studio_token": "FOO_TOKEN",
+        "studio_repo_url": "FOO_REPO_URL",
+        "studio_url": STUDIO_URL,
+    }
+
+
+def test_studio_config_dvc_config(monkeypatch):
+    monkeypatch.setenv(DVC_STUDIO_REPO_URL, "FOO_REPO_URL")
+    dvc_config = {
+        "token": "FOO_TOKEN",
+        "url": "FOO_URL",
+    }
+    expected = {
+        "studio_token": "FOO_TOKEN",
+        "studio_repo_url": "FOO_REPO_URL",
+        "studio_url": "FOO_URL",
+    }
+    assert get_studio_config(dvc_config=dvc_config) == expected
+
+
+def test_studio_config_kwarg(monkeypatch):
+    expected = {
+        "studio_token": "FOO_TOKEN",
+        "studio_repo_url": "FOO_REPO_URL",
+        "studio_url": "FOO_URL",
+    }
+    assert (
+        get_studio_config(
+            studio_token="FOO_TOKEN",
+            studio_repo_url="FOO_REPO_URL",
+            studio_url="FOO_URL",
+        )
+        == expected
+    )
+
+
+def test_studio_config_envvar_override(monkeypatch):
+    monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
+    monkeypatch.setenv(DVC_STUDIO_URL, "FOO_URL")
+    monkeypatch.setenv(DVC_STUDIO_REPO_URL, "FOO_REPO_URL")
+    dvc_config = {
+        "token": "BAR_TOKEN",
+        "url": "BAR_URL",
+    }
+    expected = {
+        "studio_token": "FOO_TOKEN",
+        "studio_repo_url": "FOO_REPO_URL",
+        "studio_url": "FOO_URL",
+    }
+    assert get_studio_config(dvc_config=dvc_config) == expected
+
+
+def test_studio_config_kwarg_override(monkeypatch):
+    monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
+    monkeypatch.setenv(DVC_STUDIO_REPO_URL, "FOO_REPO_URL")
+    monkeypatch.setenv(DVC_STUDIO_URL, "FOO_URL")
+    expected = {
+        "studio_token": "BAR_TOKEN",
+        "studio_repo_url": "BAR_REPO_URL",
+        "studio_url": "BAR_URL",
+    }
+    assert (
+        get_studio_config(
+            studio_token="BAR_TOKEN",
+            studio_repo_url="BAR_REPO_URL",
+            studio_url="BAR_URL",
+        )
+        == expected
+    )
+
+
+def test_studio_config_offline(monkeypatch):
+    monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
+    monkeypatch.setenv(DVC_STUDIO_REPO_URL, "FOO_REPO_URL")
+
+    assert get_studio_config() != {}
+
+    assert get_studio_config(offline=True) == {}
+
+    monkeypatch.setenv(DVC_STUDIO_OFFLINE, "true")
+    assert get_studio_config() == {}
+
+    monkeypatch.setenv(DVC_STUDIO_OFFLINE, "1")
+    assert get_studio_config() == {}
+
+    assert get_studio_config(dvc_config={"offline": True}) == {}
+
+
+def test_studio_config_infer_url(monkeypatch):
+    monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
+    monkeypatch.setenv(DVC_STUDIO_REPO_URL, "FOO_REPO_URL")
+
+    assert get_studio_config()["studio_url"] == STUDIO_URL
 
 
 def test_post_live_metrics_skip_on_missing_token(caplog):
@@ -43,7 +142,8 @@ def test_post_live_metrics_skip_on_missing_token(caplog):
 
 def test_post_live_metrics_skip_on_schema_error(caplog, monkeypatch):
     monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
-    monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
+    monkeypatch.setenv(DVC_STUDIO_REPO_URL, "FOO_REPO_URL")
+    monkeypatch.setenv(DVC_STUDIO_URL, STUDIO_URL)
     with caplog.at_level(logging.DEBUG, logger="dvc_studio_client.post_live_metrics"):
         assert post_live_metrics("start", "bad_hash", "fooname", "fooclient") is None
         assert caplog.records[0].message == (
@@ -340,11 +440,10 @@ def test_post_live_metrics_bad_response(mocker, monkeypatch):
     )
 
 
-def test_get_studio_token_and_repo_url_skip_repo_url(monkeypatch):
+def test_get_studio_config_skip_repo_url(monkeypatch):
     monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
-    token, repo_url = get_studio_token_and_repo_url()
-    assert token is None
-    assert repo_url is None  # Skipped call to get_repo_url
+    config = get_studio_config()
+    assert config == {}  # Skipped call to get_repo_url
 
 
 def test_post_live_metrics_token_and_repo_url_args(mocker, monkeypatch):

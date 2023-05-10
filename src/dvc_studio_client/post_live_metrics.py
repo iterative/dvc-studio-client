@@ -1,4 +1,5 @@
 import logging
+import re
 from functools import lru_cache
 from os import getenv
 from typing import Any, Dict, Literal, Optional
@@ -11,6 +12,8 @@ from voluptuous.humanize import humanize_error
 
 from .env import (
     DVC_STUDIO_CLIENT_LOGLEVEL,
+    DVC_STUDIO_OFFLINE,
+    DVC_STUDIO_REPO_URL,
     DVC_STUDIO_TOKEN,
     DVC_STUDIO_URL,
     STUDIO_ENDPOINT,
@@ -68,6 +71,86 @@ def get_studio_token_and_repo_url(studio_token=None, studio_repo_url=None):
     return studio_token, studio_repo_url
 
 
+def get_studio_config(
+    dvc_config: Optional[Dict[str, Any]] = None,
+    offline: bool = False,
+    studio_token: Optional[str] = None,
+    studio_repo_url: Optional[str] = None,
+    studio_url: Optional[str] = None,
+) -> Dict:
+    """Get studio config options.
+
+    Args:
+        dvc_config (Optional[dict]): Dict returned by dvc.Repo.config["studio"].
+        offline (bool): Whether offline mode is enabled. Default: false.
+        studio_token (Optional[str]): Studio access token obtained from the UI.
+        studio_repo_url (Optional[str]): URL of the Git repository that has been
+            imported into Studio UI.
+        studio_url (Optional[str]): Base URL of Studio UI (if self-hosted).
+    Returns:
+        Dict:
+            Config options for posting live metrics.
+            Keys match the DVC_STUDIO... environment variables.
+    """
+
+    config = {}
+    if not dvc_config:
+        dvc_config = {}
+
+    def to_bool(var):
+        if var is None:
+            return False
+        return bool(re.search("1|y|yes|true", var, flags=re.I))
+
+    offline = (
+        offline
+        or to_bool(getenv(DVC_STUDIO_OFFLINE))
+        or to_bool(dvc_config.get("offline"))
+    )
+    if offline:
+        logger.debug("Offline mode enabled. Skipping `post_studio_live_metrics`")
+        return {}
+
+    studio_token = (
+        studio_token
+        or getenv(DVC_STUDIO_TOKEN)
+        or getenv(STUDIO_TOKEN)
+        or dvc_config.get("token")
+    )
+    if studio_token:
+        config["studio_token"] = studio_token
+    else:
+        logger.debug(
+            f"{DVC_STUDIO_TOKEN} not found. Skipping `post_studio_live_metrics`"
+        )
+        return {}
+
+    studio_repo_url = (
+        studio_repo_url or getenv(DVC_STUDIO_REPO_URL) or getenv(STUDIO_REPO_URL)
+    )
+    if studio_repo_url is None:
+        logger.debug(
+            f"{DVC_STUDIO_REPO_URL} not found. Trying to automatically find it."
+        )
+        studio_repo_url = get_studio_repo_url()
+    if studio_repo_url:
+        config["studio_repo_url"] = studio_repo_url
+    else:
+        logger.debug(
+            f"{DVC_STUDIO_REPO_URL} not found. Skipping `post_studio_live_metrics`"
+        )
+        return {}
+
+    studio_url = studio_url or getenv(DVC_STUDIO_URL) or dvc_config.get("url")
+    if studio_url:
+        config["studio_url"] = studio_url
+    else:
+        logger.debug(f"{DVC_STUDIO_URL} not found. Using {STUDIO_URL}.")
+        config["studio_url"] = STUDIO_URL
+
+    return config
+
+
 def post_live_metrics(  # noqa: C901
     event_type: Literal["start", "data", "done"],
     baseline_sha: str,
@@ -80,13 +163,16 @@ def post_live_metrics(  # noqa: C901
     params: Optional[Dict[str, Any]] = None,
     plots: Optional[Dict[str, Any]] = None,
     step: Optional[int] = None,
+    dvc_config: Optional[Dict[str, Any]] = None,
+    offline: bool = False,
     studio_token: Optional[str] = None,
     studio_repo_url: Optional[str] = None,
+    studio_url: Optional[str] = None,
 ) -> Optional[bool]:
     """Post `event_type` to Studio's `api/live`.
 
-    Requires the environment variable `STUDIO_TOKEN` to be set.
-    If the environment variable `STUDIO_REPO_URL` is not set, will attempt to
+    Requires the environment variable `DVC_STUDIO_TOKEN` to be set.
+    If the environment variable `DVC_STUDIO_REPO_URL` is not set, will attempt to
     infer it from `git ls-remote --get-url`.
 
     Args:
@@ -144,29 +230,36 @@ def post_live_metrics(  # noqa: C901
                 }
             }
             ```
-        step: (Optional[int]): Current step of the training loop.
+        step (Optional[int]): Current step of the training loop.
             Usually comes from DVCLive `Live.step` property.
             Required in when `event_type="data"`.
             Defaults to `None`.
+        dvc_config (Optional[Dict]): DVC config options for Studio.
+        offline (bool): Whether offline mode is enabled.
         studio_token (Optional[str]): Studio access token obtained from the UI.
         studio_repo_url (Optional[str]): URL of the Git repository that has been
             imported into Studio UI.
+        studio_url (Optional[str]): Base URL of Studio UI (if self-hosted).
     Returns:
         Optional[bool]:
             `True` - if received status code 200 from Studio.
             `False` - if received other status code or RequestException raised.
             `None`- if prerequisites weren't met and the request was not sent.
     """
-    studio_token, studio_repo_url = get_studio_token_and_repo_url(
-        studio_token, studio_repo_url
+    config = get_studio_config(
+        dvc_config=dvc_config,
+        offline=offline,
+        studio_token=studio_token,
+        studio_repo_url=studio_repo_url,
+        studio_url=studio_url,
     )
 
-    if any(x is None for x in (studio_token, studio_repo_url)):
+    if not config:
         return None
 
     body = {
         "type": event_type,
-        "repo_url": studio_repo_url,
+        "repo_url": config["studio_repo_url"],
         "baseline_sha": baseline_sha,
         "name": name,
         "client": client,
@@ -210,16 +303,15 @@ def post_live_metrics(  # noqa: C901
     logger.debug(f"post_studio_live_metrics `{event_type=}`")
     logger.debug(f"JSON body `{body=}`")
 
-    base_url = getenv(DVC_STUDIO_URL) or STUDIO_URL
     path = getenv(STUDIO_ENDPOINT) or "api/live"
-    url = urljoin(base_url, path)
+    url = urljoin(config["studio_url"], path)
     try:
         response = requests.post(
             url,
             json=body,
             headers={
                 "Content-type": "application/json",
-                "Authorization": f"token {studio_token}",
+                "Authorization": f"token {config['studio_token']}",
             },
             timeout=5,
         )
