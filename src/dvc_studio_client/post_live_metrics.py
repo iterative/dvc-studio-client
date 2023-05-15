@@ -62,7 +62,7 @@ def get_studio_token_and_repo_url(studio_token=None, studio_repo_url=None):
     config = get_studio_config(
         studio_token=studio_token, studio_repo_url=studio_repo_url
     )
-    return config["token"], config["repo_url"]
+    return config.get("token"), config.get("repo_url")
 
 
 def get_studio_config(
