@@ -335,6 +335,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#dvc_studio_client.post_live_metrics.get_studio_config" class="md-nav__link">
+    get_studio_config()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dvc_studio_client.post_live_metrics.post_live_metrics" class="md-nav__link">
     post_live_metrics()
   </a>
@@ -409,6 +416,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#dvc_studio_client.post_live_metrics.get_studio_config" class="md-nav__link">
+    get_studio_config()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dvc_studio_client.post_live_metrics.post_live_metrics" class="md-nav__link">
     post_live_metrics()
   </a>
@@ -457,8 +471,291 @@
 
 
 
+<h2 id="dvc_studio_client.post_live_metrics.get_studio_config" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_studio_config</span><span class="p">(</span><span class="n">dvc_studio_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">offline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">studio_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">studio_repo_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">studio_url</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Get studio config options.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>dvc_studio_config</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[dict]</code>
+          </td>
+          <td><p>Dict returned by dvc.Repo.config["studio"].</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>offline</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td><p>Whether offline mode is enabled. Default: false.</p></td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>studio_token</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[str]</code>
+          </td>
+          <td><p>Studio access token obtained from the UI.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>studio_repo_url</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[str]</code>
+          </td>
+          <td><p>URL of the Git repository that has been
+imported into Studio UI.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>studio_url</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[str]</code>
+          </td>
+          <td><p>Base URL of Studio UI (if self-hosted).</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>Dict</code></td>          <td>
+                <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+          </td>
+          <td><p>Config options for posting live metrics.
+Keys match the DVC studio config section.
+Example:
+    {
+        "token": "mytoken",
+        "repo_url": "git@github.com:iterative/dvc-studio-client.git",
+        "url": "https://studio.iterative.ai",
+    }</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+      <details class="quote">
+        <summary>Source code in <code>/opt/hostedtoolcache/Python/3.10.11/x64/lib/python3.10/site-packages/dvc_studio_client/post_live_metrics.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_studio_config</span><span class="p">(</span>
+    <span class="n">dvc_studio_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">offline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">studio_token</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">studio_repo_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">studio_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get studio config options.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dvc_studio_config (Optional[dict]): Dict returned by dvc.Repo.config[&quot;studio&quot;].</span>
+<span class="sd">        offline (bool): Whether offline mode is enabled. Default: false.</span>
+<span class="sd">        studio_token (Optional[str]): Studio access token obtained from the UI.</span>
+<span class="sd">        studio_repo_url (Optional[str]): URL of the Git repository that has been</span>
+<span class="sd">            imported into Studio UI.</span>
+<span class="sd">        studio_url (Optional[str]): Base URL of Studio UI (if self-hosted).</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict:</span>
+<span class="sd">            Config options for posting live metrics.</span>
+<span class="sd">            Keys match the DVC studio config section.</span>
+<span class="sd">            Example:</span>
+<span class="sd">                {</span>
+<span class="sd">                    &quot;token&quot;: &quot;mytoken&quot;,</span>
+<span class="sd">                    &quot;repo_url&quot;: &quot;git@github.com:iterative/dvc-studio-client.git&quot;,</span>
+<span class="sd">                    &quot;url&quot;: &quot;https://studio.iterative.ai&quot;,</span>
+<span class="sd">                }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dvc_studio_config</span><span class="p">:</span>
+        <span class="n">dvc_studio_config</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">to_bool</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;1|y|yes|true&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">var</span><span class="p">),</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">))</span>
+
+    <span class="n">offline</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">offline</span>
+        <span class="ow">or</span> <span class="n">to_bool</span><span class="p">(</span><span class="n">getenv</span><span class="p">(</span><span class="n">DVC_STUDIO_OFFLINE</span><span class="p">))</span>
+        <span class="ow">or</span> <span class="n">to_bool</span><span class="p">(</span><span class="n">dvc_studio_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;offline&quot;</span><span class="p">))</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">offline</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Offline mode enabled. Skipping `post_studio_live_metrics`&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{}</span>
+
+    <span class="n">studio_token</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">studio_token</span>
+        <span class="ow">or</span> <span class="n">getenv</span><span class="p">(</span><span class="n">DVC_STUDIO_TOKEN</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="n">getenv</span><span class="p">(</span><span class="n">STUDIO_TOKEN</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="n">dvc_studio_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;token&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">studio_token</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DVC_STUDIO_TOKEN</span><span class="si">}</span><span class="s2"> not found. Skipping `post_studio_live_metrics`&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{}</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;token&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">studio_token</span>
+
+    <span class="n">studio_repo_url</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">studio_repo_url</span>
+        <span class="ow">or</span> <span class="n">getenv</span><span class="p">(</span><span class="n">DVC_STUDIO_REPO_URL</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="n">getenv</span><span class="p">(</span><span class="n">STUDIO_REPO_URL</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="n">dvc_studio_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;repo_url&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">studio_repo_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DVC_STUDIO_REPO_URL</span><span class="si">}</span><span class="s2"> not found. Trying to automatically find it.&quot;</span>
+        <span class="p">)</span>
+        <span class="n">studio_repo_url</span> <span class="o">=</span> <span class="n">get_studio_repo_url</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">studio_repo_url</span><span class="p">:</span>
+        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;repo_url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">studio_repo_url</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DVC_STUDIO_REPO_URL</span><span class="si">}</span><span class="s2"> not found. Skipping `post_studio_live_metrics`&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{}</span>
+
+    <span class="n">studio_url</span> <span class="o">=</span> <span class="n">studio_url</span> <span class="ow">or</span> <span class="n">getenv</span><span class="p">(</span><span class="n">DVC_STUDIO_URL</span><span class="p">)</span> <span class="ow">or</span> <span class="n">dvc_studio_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">studio_url</span><span class="p">:</span>
+        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">studio_url</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DVC_STUDIO_URL</span><span class="si">}</span><span class="s2"> not found. Using </span><span class="si">{</span><span class="n">STUDIO_URL</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">STUDIO_URL</span>
+
+    <span class="k">return</span> <span class="n">config</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
 <h2 id="dvc_studio_client.post_live_metrics.post_live_metrics" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">post_live_metrics</span><span class="p">(</span><span class="n">event_type</span><span class="p">,</span> <span class="n">baseline_sha</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">experiment_rev</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">machine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plots</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">studio_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">studio_repo_url</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">post_live_metrics</span><span class="p">(</span><span class="n">event_type</span><span class="p">,</span> <span class="n">baseline_sha</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">experiment_rev</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">machine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plots</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dvc_studio_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">offline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">studio_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">studio_repo_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">studio_url</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
@@ -466,8 +763,8 @@
   <div class="doc doc-contents ">
   
       <p>Post <code>event_type</code> to Studio's <code>api/live</code>.</p>
-<p>Requires the environment variable <code>STUDIO_TOKEN</code> to be set.
-If the environment variable <code>STUDIO_REPO_URL</code> is not set, will attempt to
+<p>Requires the environment variable <code>DVC_STUDIO_TOKEN</code> to be set.
+If the environment variable <code>DVC_STUDIO_REPO_URL</code> is not set, will attempt to
 infer it from <code>git ls-remote --get-url</code>.</p>
 
   <p><strong>Parameters:</strong></p>
@@ -626,12 +923,32 @@ Only used when <code>event_type="data"</code>.</p>
           <td>
                 <code><span title="typing.Optional">Optional</span>[int]</code>
           </td>
-          <td><p>(Optional[int]): Current step of the training loop.
+          <td><p>Current step of the training loop.
 Usually comes from DVCLive <code>Live.step</code> property.
 Required in when <code>event_type="data"</code>.
 Defaults to <code>None</code>.</p></td>
           <td>
                 <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>dvc_studio_config</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>]</code>
+          </td>
+          <td><p>DVC config options for Studio.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>offline</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td><p>Whether offline mode is enabled.</p></td>
+          <td>
+                <code>False</code>
           </td>
         </tr>
         <tr>
@@ -651,6 +968,16 @@ Defaults to <code>None</code>.</p></td>
           </td>
           <td><p>URL of the Git repository that has been
 imported into Studio UI.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>studio_url</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[str]</code>
+          </td>
+          <td><p>Base URL of Studio UI (if self-hosted).</p></td>
           <td>
                 <code>None</code>
           </td>
@@ -681,92 +1008,7 @@ imported into Studio UI.</p></td>
 
       <details class="quote">
         <summary>Source code in <code>/opt/hostedtoolcache/Python/3.10.11/x64/lib/python3.10/site-packages/dvc_studio_client/post_live_metrics.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 71</span>
-<span class="normal"> 72</span>
-<span class="normal"> 73</span>
-<span class="normal"> 74</span>
-<span class="normal"> 75</span>
-<span class="normal"> 76</span>
-<span class="normal"> 77</span>
-<span class="normal"> 78</span>
-<span class="normal"> 79</span>
-<span class="normal"> 80</span>
-<span class="normal"> 81</span>
-<span class="normal"> 82</span>
-<span class="normal"> 83</span>
-<span class="normal"> 84</span>
-<span class="normal"> 85</span>
-<span class="normal"> 86</span>
-<span class="normal"> 87</span>
-<span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
-<span class="normal">131</span>
-<span class="normal">132</span>
-<span class="normal">133</span>
-<span class="normal">134</span>
-<span class="normal">135</span>
-<span class="normal">136</span>
-<span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span>
-<span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">156</span>
 <span class="normal">157</span>
 <span class="normal">158</span>
 <span class="normal">159</span>
@@ -844,7 +1086,101 @@ imported into Studio UI.</p></td>
 <span class="normal">231</span>
 <span class="normal">232</span>
 <span class="normal">233</span>
-<span class="normal">234</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">post_live_metrics</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">post_live_metrics</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="n">event_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;done&quot;</span><span class="p">],</span>
     <span class="n">baseline_sha</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -856,13 +1192,16 @@ imported into Studio UI.</p></td>
     <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">plots</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">step</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dvc_studio_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">offline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">studio_token</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">studio_repo_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">studio_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Post `event_type` to Studio&#39;s `api/live`.</span>
 
-<span class="sd">    Requires the environment variable `STUDIO_TOKEN` to be set.</span>
-<span class="sd">    If the environment variable `STUDIO_REPO_URL` is not set, will attempt to</span>
+<span class="sd">    Requires the environment variable `DVC_STUDIO_TOKEN` to be set.</span>
+<span class="sd">    If the environment variable `DVC_STUDIO_REPO_URL` is not set, will attempt to</span>
 <span class="sd">    infer it from `git ls-remote --get-url`.</span>
 
 <span class="sd">    Args:</span>
@@ -920,29 +1259,36 @@ imported into Studio UI.</p></td>
 <span class="sd">                }</span>
 <span class="sd">            }</span>
 <span class="sd">            ```</span>
-<span class="sd">        step: (Optional[int]): Current step of the training loop.</span>
+<span class="sd">        step (Optional[int]): Current step of the training loop.</span>
 <span class="sd">            Usually comes from DVCLive `Live.step` property.</span>
 <span class="sd">            Required in when `event_type=&quot;data&quot;`.</span>
 <span class="sd">            Defaults to `None`.</span>
+<span class="sd">        dvc_studio_config (Optional[Dict]): DVC config options for Studio.</span>
+<span class="sd">        offline (bool): Whether offline mode is enabled.</span>
 <span class="sd">        studio_token (Optional[str]): Studio access token obtained from the UI.</span>
 <span class="sd">        studio_repo_url (Optional[str]): URL of the Git repository that has been</span>
 <span class="sd">            imported into Studio UI.</span>
+<span class="sd">        studio_url (Optional[str]): Base URL of Studio UI (if self-hosted).</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        Optional[bool]:</span>
 <span class="sd">            `True` - if received status code 200 from Studio.</span>
 <span class="sd">            `False` - if received other status code or RequestException raised.</span>
 <span class="sd">            `None`- if prerequisites weren&#39;t met and the request was not sent.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">studio_token</span><span class="p">,</span> <span class="n">studio_repo_url</span> <span class="o">=</span> <span class="n">get_studio_token_and_repo_url</span><span class="p">(</span>
-        <span class="n">studio_token</span><span class="p">,</span> <span class="n">studio_repo_url</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">get_studio_config</span><span class="p">(</span>
+        <span class="n">dvc_studio_config</span><span class="o">=</span><span class="n">dvc_studio_config</span><span class="p">,</span>
+        <span class="n">offline</span><span class="o">=</span><span class="n">offline</span><span class="p">,</span>
+        <span class="n">studio_token</span><span class="o">=</span><span class="n">studio_token</span><span class="p">,</span>
+        <span class="n">studio_repo_url</span><span class="o">=</span><span class="n">studio_repo_url</span><span class="p">,</span>
+        <span class="n">studio_url</span><span class="o">=</span><span class="n">studio_url</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="n">studio_token</span><span class="p">,</span> <span class="n">studio_repo_url</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="n">body</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">event_type</span><span class="p">,</span>
-        <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="n">studio_repo_url</span><span class="p">,</span>
+        <span class="s2">&quot;repo_url&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;repo_url&quot;</span><span class="p">],</span>
         <span class="s2">&quot;baseline_sha&quot;</span><span class="p">:</span> <span class="n">baseline_sha</span><span class="p">,</span>
         <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
         <span class="s2">&quot;client&quot;</span><span class="p">:</span> <span class="n">client</span><span class="p">,</span>
@@ -986,16 +1332,15 @@ imported into Studio UI.</p></td>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;post_studio_live_metrics `</span><span class="si">{</span><span class="n">event_type</span><span class="si">=}</span><span class="s2">`&quot;</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;JSON body `</span><span class="si">{</span><span class="n">body</span><span class="si">=}</span><span class="s2">`&quot;</span><span class="p">)</span>
 
-    <span class="n">base_url</span> <span class="o">=</span> <span class="n">getenv</span><span class="p">(</span><span class="n">DVC_STUDIO_URL</span><span class="p">)</span> <span class="ow">or</span> <span class="n">STUDIO_URL</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">getenv</span><span class="p">(</span><span class="n">STUDIO_ENDPOINT</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;api/live&quot;</span>
-    <span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">base_url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">],</span> <span class="n">path</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
             <span class="n">url</span><span class="p">,</span>
             <span class="n">json</span><span class="o">=</span><span class="n">body</span><span class="p">,</span>
             <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
                 <span class="s2">&quot;Content-type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;token </span><span class="si">{</span><span class="n">studio_token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;token </span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;token&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="p">},</span>
             <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
         <span class="p">)</span>
