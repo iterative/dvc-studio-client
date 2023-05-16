@@ -17,6 +17,7 @@ from dvc_studio_client.post_live_metrics import (
     STUDIO_URL,
     _get_remote_url,
     get_studio_config,
+    get_studio_token_and_repo_url,
     post_live_metrics,
 )
 
@@ -542,3 +543,17 @@ def test_post_live_metrics_message(mocker, monkeypatch):
         },
         timeout=5,
     )
+
+
+@pytest.mark.parametrize("var", [DVC_STUDIO_TOKEN, STUDIO_TOKEN])
+def test_studio_token_envvar(monkeypatch, var):
+    monkeypatch.setenv(var, "FOO_TOKEN")
+    monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
+    assert get_studio_token_and_repo_url() == ("FOO_TOKEN", "FOO_REPO_URL")
+
+
+def test_get_studio_token_and_repo_url_skip_repo_url(monkeypatch):
+    monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
+    token, repo_url = get_studio_token_and_repo_url()
+    assert token is None
+    assert repo_url is None  # Skipped call to get_repo_url
