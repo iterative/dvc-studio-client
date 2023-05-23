@@ -315,7 +315,7 @@ def post_live_metrics(  # noqa: C901
                 "Content-type": "application/json",
                 "Authorization": f"token {config['token']}",
             },
-            timeout=5,
+            timeout=(30, 5),
         )
     except RequestException:
         return False

@@ -186,7 +186,7 @@ def test_post_live_metrics_start_event(mocker, monkeypatch):
             "Authorization": "token FOO_TOKEN",
             "Content-type": "application/json",
         },
-        timeout=5,
+        timeout=(30, 5),
     )
 
     post_live_metrics(
@@ -211,7 +211,7 @@ def test_post_live_metrics_start_event(mocker, monkeypatch):
             "Authorization": "token FOO_TOKEN",
             "Content-type": "application/json",
         },
-        timeout=5,
+        timeout=(30, 5),
     )
 
 
@@ -246,7 +246,7 @@ def test_post_live_metrics_start_event_machine(mocker, monkeypatch):
             "Authorization": "token FOO_TOKEN",
             "Content-type": "application/json",
         },
-        timeout=5,
+        timeout=(30, 5),
     )
 
 
@@ -281,7 +281,7 @@ def test_post_live_metrics_data(mocker, monkeypatch):
             "Authorization": "token FOO_TOKEN",
             "Content-type": "application/json",
         },
-        timeout=5,
+        timeout=(30, 5),
     )
 
     assert post_live_metrics(
@@ -307,7 +307,7 @@ def test_post_live_metrics_data(mocker, monkeypatch):
             "Authorization": "token FOO_TOKEN",
             "Content-type": "application/json",
         },
-        timeout=5,
+        timeout=(30, 5),
     )
 
     assert post_live_metrics(
@@ -337,7 +337,7 @@ def test_post_live_metrics_data(mocker, monkeypatch):
             "Authorization": "token FOO_TOKEN",
             "Content-type": "application/json",
         },
-        timeout=5,
+        timeout=(30, 5),
     )
 
 
@@ -368,7 +368,7 @@ def test_post_live_metrics_done(mocker, monkeypatch):
             "Authorization": "token FOO_TOKEN",
             "Content-type": "application/json",
         },
-        timeout=5,
+        timeout=(30, 5),
     )
 
     assert post_live_metrics(
@@ -388,7 +388,7 @@ def test_post_live_metrics_done(mocker, monkeypatch):
             "Authorization": "token FOO_TOKEN",
             "Content-type": "application/json",
         },
-        timeout=5,
+        timeout=(30, 5),
     )
 
     assert post_live_metrics(
@@ -412,7 +412,7 @@ def test_post_live_metrics_done(mocker, monkeypatch):
             "Authorization": "token FOO_TOKEN",
             "Content-type": "application/json",
         },
-        timeout=5,
+        timeout=(30, 5),
     )
 
 
@@ -480,7 +480,7 @@ def test_post_live_metrics_token_and_repo_url_args(mocker, monkeypatch):
             "Authorization": "token FOO_TOKEN",
             "Content-type": "application/json",
         },
-        timeout=5,
+        timeout=(30, 5),
     )
 
 
@@ -515,7 +515,7 @@ def test_post_live_metrics_message(mocker, monkeypatch):
             "Authorization": "token FOO_TOKEN",
             "Content-type": "application/json",
         },
-        timeout=5,
+        timeout=(30, 5),
     )
 
     # Test message length limit
@@ -541,7 +541,7 @@ def test_post_live_metrics_message(mocker, monkeypatch):
             "Authorization": "token FOO_TOKEN",
             "Content-type": "application/json",
         },
-        timeout=5,
+        timeout=(30, 5),
     )
 
 
