@@ -25,6 +25,10 @@ from .schema import SCHEMAS_BY_TYPE
 STUDIO_URL = "https://studio.iterative.ai"
 
 logger = logging.getLogger(__name__)
+handler = logging.StreamHandler()
+formatter = logging.Formatter("%(levelname)s:%(name)s:%(message)s")
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 logger.setLevel(getenv(DVC_STUDIO_CLIENT_LOGLEVEL, "INFO").upper())
 
 
@@ -317,7 +321,8 @@ def post_live_metrics(  # noqa: C901
             },
             timeout=(30, 5),
         )
-    except RequestException:
+    except RequestException as e:
+        logger.warning(f"Failed to post to Studio: {e}")
         return False
 
     message = response.content.decode()
@@ -325,4 +330,8 @@ def post_live_metrics(  # noqa: C901
         f"post_to_studio: {response.status_code=}" f", {message=}" if message else ""
     )
 
-    return response.status_code == 200
+    if response.status_code != 200:
+        logger.warning(f"Failed to post to Studio: {message}")
+        return False
+
+    return True
