@@ -16,6 +16,7 @@ from .env import (
     DVC_STUDIO_REPO_URL,
     DVC_STUDIO_TOKEN,
     DVC_STUDIO_URL,
+    DVCLIVE_LOGLEVEL,
     STUDIO_ENDPOINT,
     STUDIO_REPO_URL,
     STUDIO_TOKEN,
@@ -29,7 +30,9 @@ handler = logging.StreamHandler()
 formatter = logging.Formatter("%(levelname)s:%(name)s:%(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
-logger.setLevel(getenv(DVC_STUDIO_CLIENT_LOGLEVEL, "INFO").upper())
+logger.setLevel(
+    getenv(DVC_STUDIO_CLIENT_LOGLEVEL, getenv(DVCLIVE_LOGLEVEL, "WARNING")).upper()
+)
 
 
 def _get_remote_url() -> str:
