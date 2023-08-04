@@ -17,7 +17,7 @@ BASE_SCHEMA = Schema(
         Required(
             "repo_url"
         ): str,  # TODO: use some url validator, voluptuous.Url is too strict
-        Required("baseline_sha"): Sha,
+        Required("baseline_sha"): Any(Sha, None),
         "name": str,
         "env": dict,
         "client": str,
