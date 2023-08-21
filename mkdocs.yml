@@ -10,8 +10,8 @@ theme:
   icon:
     repo: fontawesome/brands/github
 
-repo_url: https://github.com/iterative/DVC Studio Client
-repo_name: iterative/DVC Studio Client
+repo_url: https://github.com/iterative/dvc-studio-client
+repo_name: iterative/dvc-studio-client
 
 extra:
   social:
