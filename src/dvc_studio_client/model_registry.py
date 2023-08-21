@@ -1,14 +1,11 @@
-import logging
 from typing import Dict, Optional
 from urllib.parse import urljoin
 
 import requests
 from requests.exceptions import RequestException
 
-from .post_live_metrics import get_studio_config
-
-logger = logging.getLogger(__name__)
-
+from . import logger
+from .config import get_studio_config
 
 MODEL_REGISTRY_API_PATH = "api/model-registry"
 GET_DOWNLOAD_URIS_PATH = f"{MODEL_REGISTRY_API_PATH}/get-download-uris"
