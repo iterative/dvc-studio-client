@@ -1,3 +1,4 @@
+import json
 from os import getenv
 from typing import Any, Dict, Literal, Optional
 from urllib.parse import urljoin
@@ -12,6 +13,11 @@ from .config import get_studio_config
 from .env import DVC_STUDIO_TOKEN, STUDIO_ENDPOINT, STUDIO_TOKEN
 from .schema import SCHEMAS_BY_TYPE
 
+# Studio PROD and DEV have a hardcoded limit of 30MB for the request body.
+MAX_REQUEST_SIZE = 29000000
+# Studio backend discards files larger than 10MB as big files when parsing commits.
+MAX_PLOT_SIZE = 10000000
+
 
 def get_studio_token_and_repo_url(studio_token=None, studio_repo_url=None):
     studio_token = studio_token or getenv(DVC_STUDIO_TOKEN) or getenv(STUDIO_TOKEN)
@@ -20,6 +26,71 @@ def get_studio_token_and_repo_url(studio_token=None, studio_repo_url=None):
         studio_token=studio_token, studio_repo_url=studio_repo_url
     )
     return config.get("token"), config.get("repo_url")
+
+
+def _single_post(url, body, token):
+    try:
+        response = requests.post(
+            url,
+            json=body,
+            headers={
+                "Content-type": "application/json",
+                "Authorization": f"token {token}",
+            },
+            timeout=(30, 5),
+        )
+    except RequestException as e:
+        logger.warning(f"Failed to post to Studio: {e}")
+        return False
+
+    message = response.content.decode()
+    logger.debug(
+        f"post_to_studio: {response.status_code=}" f", {message=}" if message else ""
+    )
+
+    if response.status_code != 200:
+        logger.warning(f"Failed to post to Studio: {message}")
+        return False
+
+    return True
+
+
+def _post_in_chunks(url, body, token):
+    plots = body.pop("plots")
+
+    # First, post only metrics and params
+    if not _single_post(url, body, token):
+        return False
+    body.pop("metrics", None)
+    body.pop("params", None)
+
+    # Studio backend has a limitation on the size of the request body.
+    # So we try to send as many plots as possible without xeceeding the limit.
+    body["plots"] = {}
+    total_size = 0
+    for plot_name, plot_data in plots.items():
+        if "data" in plot_data:
+            size = len(json.dumps(plot_data["data"]).encode("utf-8"))
+        elif "image" in plot_data:
+            size = len(plot_data["image"])
+
+        if size > MAX_PLOT_SIZE:
+            logger.warning(f"Plot {plot_name} is too large to be sent to Studio.")
+            continue
+
+        total_size += size
+        if total_size > MAX_REQUEST_SIZE:
+            logger.warning(
+                "Request is too large for Studio. Some plots will not be sent."
+            )
+            break
+        body["plots"][plot_name] = plot_data
+
+    if body["plots"]:
+        if not _single_post(url, body, token):
+            return False
+
+    return True
 
 
 def post_live_metrics(  # noqa: C901
@@ -98,6 +169,9 @@ def post_live_metrics(  # noqa: C901
             plots={
                 "dvclive/plots/metrics/foo.tsv": {
                     "data": [{"step": 0, "foo": 1.0}]
+                },
+                "dvclive/plots/images/bar.png": {
+                    "image": "base64-string"
                 }
             }
             ```
@@ -156,7 +230,6 @@ def post_live_metrics(  # noqa: C901
         body["step"] = step
         if plots:
             body["plots"] = plots
-
     elif event_type == "done":
         if experiment_rev:
             body["experiment_rev"] = experiment_rev
@@ -172,31 +245,12 @@ def post_live_metrics(  # noqa: C901
         return None
 
     logger.debug(f"post_studio_live_metrics `{event_type=}`")
-    logger.debug(f"JSON body `{body=}`")
 
     path = getenv(STUDIO_ENDPOINT) or "api/live"
     url = urljoin(config["url"], path)
-    try:
-        response = requests.post(
-            url,
-            json=body,
-            headers={
-                "Content-type": "application/json",
-                "Authorization": f"token {config['token']}",
-            },
-            timeout=(30, 5),
-        )
-    except RequestException as e:
-        logger.warning(f"Failed to post to Studio: {e}")
-        return False
+    token = config["token"]
 
-    message = response.content.decode()
-    logger.debug(
-        f"post_to_studio: {response.status_code=}" f", {message=}" if message else ""
-    )
+    if body["type"] != "data" or "plots" not in body:
+        return _single_post(url, body, token)
 
-    if response.status_code != 200:
-        logger.warning(f"Failed to post to Studio: {message}")
-        return False
-
-    return True
+    return _post_in_chunks(url, body, token)
