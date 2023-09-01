@@ -657,37 +657,16 @@ imported into Studio UI.</p>
         </tr>
     </tbody>
   </table>
-
-
-
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-<td><code>Dict</code></td>          <td>
-                <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Config options for posting live metrics.
-Keys match the DVC studio config section.
-Example:
-    {
-        "token": "mytoken",
-        "repo_url": "git@github.com:iterative/dvc-studio-client.git",
-        "url": "https://studio.iterative.ai",
-    }</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      <p>Returns:
+    Dict:
+        Config options for posting live metrics.
+        Keys match the DVC studio config section.
+        Example:
+            {
+                "token": "mytoken",
+                "repo_url": "git@github.com:iterative/dvc-studio-client.git",
+                "url": "https://studio.iterative.ai",
+            }</p>
 
           <details class="quote">
             <summary>Source code in <code>/opt/hostedtoolcache/Python/3.10.12/x64/lib/python3.10/site-packages/dvc_studio_client/config.py</code></summary>
