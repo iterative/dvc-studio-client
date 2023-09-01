@@ -12,6 +12,7 @@ from dvc_studio_client.env import (
     STUDIO_TOKEN,
 )
 from dvc_studio_client.post_live_metrics import (
+    MAX_NUMBER_OF_PLOTS,
     get_studio_token_and_repo_url,
     post_live_metrics,
 )
@@ -562,3 +563,31 @@ def test_post_in_chunks_skip_large_single_plot(mocker, monkeypatch):
         plots={"dvclive/plots/images/foo.png": {"image": mocked_image}},
     )
     assert mocked_post.call_count == 1
+
+
+def test_post_in_chunks_max_number_of_plots(mocker, monkeypatch):
+    monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
+    monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
+
+    mocked_response = mocker.MagicMock()
+    mocked_response.status_code = 200
+
+    plots = {}
+    for i in range(MAX_NUMBER_OF_PLOTS + 2):
+        plots[f"dvclive/plots/images/{i}.png"] = {
+            "data": [{"step": i, "foo": float(i)}]
+        }
+    mocked_post = mocker.patch("requests.post", return_value=mocked_response)
+    assert post_live_metrics(
+        "data",
+        "f" * 40,
+        "fooname",
+        "fooclient",
+        step=0,
+        metrics={"dvclive/metrics.json": {"data": {"step": 0, "foo": 1}}},
+        plots=plots,
+    )
+    assert mocked_post.call_count == 2
+    assert (
+        len(mocked_post.call_args_list[-1][1]["json"]["plots"]) == MAX_NUMBER_OF_PLOTS
+    )

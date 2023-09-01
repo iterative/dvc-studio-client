@@ -17,6 +17,8 @@ from .schema import SCHEMAS_BY_TYPE
 MAX_REQUEST_SIZE = 29000000
 # Studio backend discards files larger than 10MB as big files when parsing commits.
 MAX_PLOT_SIZE = 10000000
+# Studio backend limit number of files inside a plot directory.
+MAX_NUMBER_OF_PLOTS = 200
 
 
 def get_studio_token_and_repo_url(studio_token=None, studio_repo_url=None):
@@ -68,20 +70,31 @@ def _post_in_chunks(url, body, token):
     # So we try to send as many plots as possible without xeceeding the limit.
     body["plots"] = {}
     total_size = 0
-    for plot_name, plot_data in plots.items():
+    for n, (plot_name, plot_data) in enumerate(plots.items()):
+        if n >= MAX_NUMBER_OF_PLOTS:
+            logger.warning(
+                f"Number of plots exceeds Studio limit ({MAX_NUMBER_OF_PLOTS}). "
+                "Some plots will not be sent."
+            )
+            break
+
         if "data" in plot_data:
             size = len(json.dumps(plot_data["data"]).encode("utf-8"))
         elif "image" in plot_data:
             size = len(plot_data["image"])
 
         if size > MAX_PLOT_SIZE:
-            logger.warning(f"Plot {plot_name} is too large to be sent to Studio.")
+            logger.warning(
+                f"Size of plot exceeds Studio limit ({MAX_PLOT_SIZE}). "
+                f"{plot_name} will not be sent."
+            )
             continue
 
         total_size += size
         if total_size > MAX_REQUEST_SIZE:
             logger.warning(
-                "Request is too large for Studio. Some plots will not be sent."
+                f"Total size of plots exceeds Studio limit ({MAX_REQUEST_SIZE}). "
+                "Some plots will not be sent."
             )
             break
         body["plots"][plot_name] = plot_data
