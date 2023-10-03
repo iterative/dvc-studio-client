@@ -12,6 +12,7 @@ from dvc_studio_client.env import (
     STUDIO_TOKEN,
 )
 from dvc_studio_client.post_live_metrics import (
+    MAX_NUMBER_OF_PLOTS,
     get_studio_token_and_repo_url,
     post_live_metrics,
 )
@@ -190,6 +191,7 @@ def test_post_live_metrics_data(mocker, monkeypatch):
         timeout=(30, 5),
     )
 
+    mocked_post = mocker.patch("requests.post", return_value=mocked_response)
     assert post_live_metrics(
         "data",
         "f" * 40,
@@ -199,25 +201,50 @@ def test_post_live_metrics_data(mocker, monkeypatch):
         metrics={"dvclive/metrics.json": {"data": {"step": 0, "foo": 1}}},
         plots={"dvclive/plots/metrics/foo.tsv": {"data": [{"step": 0, "foo": 1.0}]}},
     )
-    mocked_post.assert_called_with(
-        "https://studio.iterative.ai/api/live",
-        json={
-            "type": "data",
-            "repo_url": "FOO_REPO_URL",
-            "baseline_sha": "f" * 40,
-            "name": "fooname",
-            "client": "fooclient",
-            "step": 0,
-            "metrics": {"dvclive/metrics.json": {"data": {"step": 0, "foo": 1}}},
-            "plots": {
-                "dvclive/plots/metrics/foo.tsv": {"data": [{"step": 0, "foo": 1.0}]}
-            },
-        },
-        headers={
-            "Authorization": "token FOO_TOKEN",
-            "Content-type": "application/json",
-        },
-        timeout=(30, 5),
+
+    assert mocked_post.has_calls(
+        [
+            mocker.call(
+                "https://studio.iterative.ai/api/live",
+                json={
+                    "type": "data",
+                    "repo_url": "FOO_REPO_URL",
+                    "baseline_sha": "f" * 40,
+                    "name": "fooname",
+                    "client": "fooclient",
+                    "step": 0,
+                    "metrics": {
+                        "dvclive/metrics.json": {"data": {"step": 0, "foo": 1}}
+                    },
+                },
+                headers={
+                    "Authorization": "token FOO_TOKEN",
+                    "Content-type": "application/json",
+                },
+                timeout=(30, 5),
+            ),
+            mocker.call(
+                "https://studio.iterative.ai/api/live",
+                json={
+                    "type": "data",
+                    "repo_url": "FOO_REPO_URL",
+                    "baseline_sha": "f" * 40,
+                    "name": "fooname",
+                    "client": "fooclient",
+                    "step": 0,
+                    "plots": {
+                        "dvclive/plots/metrics/foo.tsv": {
+                            "data": [{"step": 0, "foo": 1.0}]
+                        }
+                    },
+                },
+                headers={
+                    "Authorization": "token FOO_TOKEN",
+                    "Content-type": "application/json",
+                },
+                timeout=(30, 5),
+            ),
+        ]
     )
 
 
@@ -431,3 +458,136 @@ def test_get_studio_token_and_repo_url_skip_repo_url(monkeypatch):
     token, repo_url = get_studio_token_and_repo_url()
     assert token is None
     assert repo_url is None  # Skipped call to get_repo_url
+
+
+def test_post_in_chunks(mocker, monkeypatch):
+    monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
+    monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
+
+    mocked_response = mocker.MagicMock()
+    mocked_response.status_code = 200
+
+    mocked_image = mocker.MagicMock("foo")
+    mocked_image.__len__.return_value = 9000000
+
+    mocked_post = mocker.patch("requests.post", return_value=mocked_response)
+    assert post_live_metrics(
+        "data",
+        "f" * 40,
+        "fooname",
+        "fooclient",
+        step=0,
+        metrics={"dvclive/metrics.json": {"data": {"step": 0, "foo": 1}}},
+        plots={"dvclive/plots/images/foo.png": {"image": mocked_image}},
+    )
+    # 1 call for metrics and params, 1 call for plots
+    assert mocked_post.call_count == 2
+
+    # 3.png will not be sent because it exceeds the limit size.
+    mocked_post = mocker.patch("requests.post", return_value=mocked_response)
+    assert post_live_metrics(
+        "data",
+        "f" * 40,
+        "fooname",
+        "fooclient",
+        step=0,
+        metrics={"dvclive/metrics.json": {"data": {"step": 0, "foo": 1}}},
+        plots={
+            "dvclive/plots/images/0.png": {"image": mocked_image},
+            "dvclive/plots/images/1.png": {"image": mocked_image},
+            "dvclive/plots/images/2.png": {"image": mocked_image},
+            "dvclive/plots/images/3.png": {"image": mocked_image},
+        },
+    )
+    assert mocked_post.call_count == 2
+    assert mocked_post.has_calls(
+        [
+            mocker.call(
+                "https://studio.iterative.ai/api/live",
+                json={
+                    "type": "data",
+                    "repo_url": "FOO_REPO_URL",
+                    "baseline_sha": "f" * 40,
+                    "name": "fooname",
+                    "client": "fooclient",
+                    "step": 0,
+                    "metrics": {
+                        "dvclive/metrics.json": {"data": {"step": 0, "foo": 1}}
+                    },
+                },
+                headers={
+                    "Authorization": "token FOO_TOKEN",
+                    "Content-type": "application/json",
+                },
+                timeout=(30, 5),
+            ),
+            mocker.call(
+                "https://studio.iterative.ai/api/live",
+                json={
+                    "type": "data",
+                    "repo_url": "FOO_REPO_URL",
+                    "baseline_sha": "f" * 40,
+                    "name": "fooname",
+                    "client": "fooclient",
+                    "step": 0,
+                    "plots": {"dvclive/plots/images/foo.png": {"image": mocked_image}},
+                },
+                headers={
+                    "Authorization": "token FOO_TOKEN",
+                    "Content-type": "application/json",
+                },
+                timeout=(30, 5),
+            ),
+        ]
+    )
+
+
+def test_post_in_chunks_skip_large_single_plot(mocker, monkeypatch):
+    monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
+    monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
+
+    mocked_response = mocker.MagicMock()
+    mocked_response.status_code = 200
+
+    mocked_image = mocker.MagicMock("foo")
+    mocked_image.__len__.return_value = 29200000
+
+    mocked_post = mocker.patch("requests.post", return_value=mocked_response)
+    assert post_live_metrics(
+        "data",
+        "f" * 40,
+        "fooname",
+        "fooclient",
+        step=0,
+        metrics={"dvclive/metrics.json": {"data": {"step": 0, "foo": 1}}},
+        plots={"dvclive/plots/images/foo.png": {"image": mocked_image}},
+    )
+    assert mocked_post.call_count == 1
+
+
+def test_post_in_chunks_max_number_of_plots(mocker, monkeypatch):
+    monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
+    monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
+
+    mocked_response = mocker.MagicMock()
+    mocked_response.status_code = 200
+
+    plots = {}
+    for i in range(MAX_NUMBER_OF_PLOTS + 2):
+        plots[f"dvclive/plots/images/{i}.png"] = {
+            "data": [{"step": i, "foo": float(i)}]
+        }
+    mocked_post = mocker.patch("requests.post", return_value=mocked_response)
+    assert post_live_metrics(
+        "data",
+        "f" * 40,
+        "fooname",
+        "fooclient",
+        step=0,
+        metrics={"dvclive/metrics.json": {"data": {"step": 0, "foo": 1}}},
+        plots=plots,
+    )
+    assert mocked_post.call_count == 2
+    assert (
+        len(mocked_post.call_args_list[-1][1]["json"]["plots"]) == MAX_NUMBER_OF_PLOTS
+    )
