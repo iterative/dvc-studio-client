@@ -29,7 +29,7 @@ def start_device_login(
         client_name: str,
         base_url: str = None,
         token_name: Optional[str] = None,
-        scopes: list[str] | None = None,
+        scopes: [str] | None = None,
 ) -> DeviceLoginResponse:
     """
 
