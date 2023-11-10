@@ -2,7 +2,11 @@ import pytest
 import requests
 from requests import Response
 
-from dvc_studio_client.auth import start_device_login, check_token_authorization, DeviceLoginResponse
+from dvc_studio_client.auth import (
+    DeviceLoginResponse,
+    check_token_authorization,
+    start_device_login,
+)
 
 
 def test_start_device_login(mocker):
@@ -23,15 +27,15 @@ def test_start_device_login(mocker):
         base_url="https://example.com",
         client_name="dvc",
         token_name="token_name",
-        scopes=["live"]
+        scopes=["live"],
     )
 
     assert mock_post.called
     assert mock_post.call_args == mocker.call(
-        url='https://example.com/api/device-login',
-        json={'client_name': 'dvc', 'token_name': 'token_name', 'scopes': ['live']},
-        headers={'Content-type': 'application/json'},
-        timeout=5
+        url="https://example.com/api/device-login",
+        json={"client_name": "dvc", "token_name": "token_name", "scopes": ["live"]},
+        headers={"Content-type": "application/json"},
+        timeout=5,
     )
     assert response == example_response
 
@@ -47,10 +51,10 @@ def test_check_token_authorization_expired(mocker):
     )
 
     assert (
-            check_token_authorization(
-                uri="https://example.com/token_uri", device_code="random_device_code"
-            )
-            is None
+        check_token_authorization(
+            uri="https://example.com/token_uri", device_code="random_device_code"
+        )
+        is None
     )
 
     assert mock_post.call_count == 2
@@ -98,10 +102,10 @@ def test_check_token_authorization_success(mocker):
     )
 
     assert (
-            check_token_authorization(
-                uri="https://example.com/token_uri", device_code="random_device_code"
-            )
-            == "isat_token"
+        check_token_authorization(
+            uri="https://example.com/token_uri", device_code="random_device_code"
+        )
+        == "isat_token"
     )
 
     assert mock_post.call_count == 3

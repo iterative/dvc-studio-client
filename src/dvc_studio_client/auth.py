@@ -1,10 +1,9 @@
 import logging
+from os import getenv
+from typing import List, Optional, TypedDict
 from urllib.parse import urljoin
 
 import requests
-from os import getenv
-from typing import Optional, TypedDict, Any
-
 from requests.adapters import HTTPAdapter
 
 from .env import DVC_STUDIO_CLIENT_LOGLEVEL
@@ -25,11 +24,11 @@ class DeviceLoginResponse(TypedDict):
 
 
 def start_device_login(
-        *,
-        client_name: str,
-        base_url: str = None,
-        token_name: Optional[str] = None,
-        scopes: [str] | None = None,
+    *,
+    client_name: str,
+    base_url: str = None,
+    token_name: Optional[str] = None,
+    scopes: List[str] | None = None,
 ) -> DeviceLoginResponse:
     """
 
@@ -39,7 +38,8 @@ def start_device_login(
     - client_name (required): The name of the client application.
 
     Optional Parameters:
-    - base_url: The base URL of the Studio API. If not provided, the default value is "https://studio.iterative.ai".
+    - base_url: The base URL of the Studio API.
+        If not provided, the default value is "https://studio.iterative.ai".
     - token_name: The name of the token. If not provided, it defaults to None.
     - scopes: A list of scopes to request. If not provided, it defaults to None.
 
@@ -55,12 +55,8 @@ def start_device_login(
         "Starting device login for Studio%s",
         f" ({base_url})" if base_url else "",
     )
-    if invalid_scopes := list(
-            filter(lambda s: s not in AVAILABLE_SCOPES, scopes)
-    ):
-        raise ValueError(
-            f"Following scopes are not valid: {', '.join(invalid_scopes)}"
-        )
+    if invalid_scopes := list(filter(lambda s: s not in AVAILABLE_SCOPES, scopes)):
+        raise ValueError(f"Following scopes are not valid: {', '.join(invalid_scopes)}")
 
     body = {"client_name": client_name}
 
@@ -84,9 +80,7 @@ def start_device_login(
     response.raise_for_status()
     d = response.json()
 
-    logger.debug(
-        "received response: %s (status=%r)", d, response.status_code
-    )
+    logger.debug("received response: %s (status=%r)", d, response.status_code)
     return d
 
 
@@ -107,7 +101,9 @@ def check_token_authorization(*, uri: str, device_code: str) -> str | None:
 
     Example Usage:
     ```
-    token = check_token_authorization(uri="https://example.com/api/", device_code="1234567890")
+    token = check_token_authorization(
+        uri="https://example.com/api/", device_code="1234567890"
+    )
     if token is not None:
         print("Access token:", token)
     else:
