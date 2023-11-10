@@ -1,9 +1,7 @@
 DVC Studio Client
 =================
 
-Small library to post data from DVC/DVCLive to Iterative Studio.
-
-Currently, it only provides functions for posting to Studio's ``api/live``.
+Client to interact with `DVC Studio`_.
 
 |PyPI| |Status| |Python Version| |License|
 
@@ -34,6 +32,15 @@ Currently, it only provides functions for posting to Studio's ``api/live``.
    :target: https://github.com/psf/black
    :alt: Black
 
+Features
+--------
+
+- Model Registry
+   - `get_download_uris`_: Return download URIs for the specified model.
+
+- Live Experiments
+   - `post_live_metrics`_: Post updates to `api/live`.
+
 Installation
 ------------
 
@@ -63,3 +70,6 @@ please `file an issue`_ along with a detailed description.
 .. _pip: https://pip.pypa.io/
 .. github-only
 .. _Contributor Guide: CONTRIBUTING.rst
+.. _DVC Studio: https://dvc.org/doc/studio
+.. _get_download_uris: https://docs.iterative.ai/dvc-studio-client/reference/dvc_studio_client/model_registry/
+.. _post_live_metrics: https://docs.iterative.ai/dvc-studio-client/reference/dvc_studio_client/post_live_metrics/

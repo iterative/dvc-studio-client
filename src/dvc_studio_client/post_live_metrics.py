@@ -1,81 +1,133 @@
-import logging
-from functools import lru_cache
+import json
 from os import getenv
 from typing import Any, Dict, Literal, Optional
+from urllib.parse import urljoin
 
 import requests
 from requests.exceptions import RequestException
 from voluptuous import Invalid, MultipleInvalid
 from voluptuous.humanize import humanize_error
 
-from .env import (
-    DVC_STUDIO_CLIENT_LOGLEVEL,
-    STUDIO_ENDPOINT,
-    STUDIO_REPO_URL,
-    STUDIO_TOKEN,
-)
+from . import logger
+from .config import get_studio_config
+from .env import DVC_STUDIO_TOKEN, STUDIO_ENDPOINT, STUDIO_TOKEN
 from .schema import SCHEMAS_BY_TYPE
 
-logger = logging.getLogger(__name__)
-logger.setLevel(getenv(DVC_STUDIO_CLIENT_LOGLEVEL, "INFO").upper())
+# Studio PROD and DEV have a hardcoded limit of 30MB for the request body.
+MAX_REQUEST_SIZE = 29000000
+# Studio backend discards files larger than 10MB as big files when parsing commits.
+MAX_PLOT_SIZE = 10000000
+# Studio backend limit number of files inside a plot directory.
+MAX_NUMBER_OF_PLOTS = 200
 
 
-def _get_remote_url() -> str:
-    from dulwich.porcelain import get_remote_repo
-    from dulwich.repo import Repo
-
-    with Repo.discover() as repo:
-        try:
-            _remote, url = get_remote_repo(repo)
-        except IndexError:
-            # IndexError happens when the head is detached
-            _remote, url = get_remote_repo(repo, b"origin")
-        return url
+def get_studio_token_and_repo_url(studio_token=None, studio_repo_url=None):
+    studio_token = studio_token or getenv(DVC_STUDIO_TOKEN) or getenv(STUDIO_TOKEN)
+    """Get studio token and repo_url. Kept for backwards compatibility."""
+    config = get_studio_config(
+        studio_token=studio_token, studio_repo_url=studio_repo_url
+    )
+    return config.get("token"), config.get("repo_url")
 
 
-@lru_cache(maxsize=1)
-def get_studio_repo_url() -> Optional[str]:
-    from dulwich.errors import NotGitRepository
-
+def _single_post(url, body, token):
     try:
-        return _get_remote_url()
-    except NotGitRepository:
-        logger.warning(
-            "Couldn't find a valid Studio Repo URL.\n"
-            "You can try manually setting the environment variable `%s`.",
-            STUDIO_REPO_URL,
+        response = requests.post(
+            url,
+            json=body,
+            headers={
+                "Content-type": "application/json",
+                "Authorization": f"token {token}",
+            },
+            timeout=(30, 5),
         )
-        return None
+    except RequestException as e:
+        logger.warning(f"Failed to post to Studio: {e}")
+        return False
+
+    message = response.content.decode()
+    logger.debug(
+        f"post_to_studio: {response.status_code=}" f", {message=}" if message else ""
+    )
+
+    if response.status_code != 200:
+        logger.warning(f"Failed to post to Studio: {message}")
+        return False
+
+    return True
 
 
-def get_studio_token_and_repo_url():
-    studio_token = getenv(STUDIO_TOKEN, None)
-    if studio_token is None:
-        logger.debug("STUDIO_TOKEN not found. Skipping `post_studio_live_metrics`")
-        return None, None
+def _post_in_chunks(url, body, token):
+    plots = body.pop("plots")
 
-    studio_repo_url = getenv(STUDIO_REPO_URL, None)
-    if studio_repo_url is None:
-        logger.debug(f"`{STUDIO_REPO_URL}` not found. Trying to automatically find it.")
-        studio_repo_url = get_studio_repo_url()
-    return studio_token, studio_repo_url
+    # First, post only metrics and params
+    if not _single_post(url, body, token):
+        return False
+    body.pop("metrics", None)
+    body.pop("params", None)
+
+    # Studio backend has a limitation on the size of the request body.
+    # So we try to send as many plots as possible without xeceeding the limit.
+    body["plots"] = {}
+    total_size = 0
+    for n, (plot_name, plot_data) in enumerate(plots.items()):
+        if n >= MAX_NUMBER_OF_PLOTS:
+            logger.warning(
+                f"Number of plots exceeds Studio limit ({MAX_NUMBER_OF_PLOTS}). "
+                "Some plots will not be sent."
+            )
+            break
+
+        if "data" in plot_data:
+            size = len(json.dumps(plot_data["data"]).encode("utf-8"))
+        elif "image" in plot_data:
+            size = len(plot_data["image"])
+
+        if size > MAX_PLOT_SIZE:
+            logger.warning(
+                f"Size of plot exceeds Studio limit ({MAX_PLOT_SIZE}). "
+                f"{plot_name} will not be sent."
+            )
+            continue
+
+        total_size += size
+        if total_size > MAX_REQUEST_SIZE:
+            logger.warning(
+                f"Total size of plots exceeds Studio limit ({MAX_REQUEST_SIZE}). "
+                "Some plots will not be sent."
+            )
+            break
+        body["plots"][plot_name] = plot_data
+
+    if body["plots"]:
+        if not _single_post(url, body, token):
+            return False
+
+    return True
 
 
-def post_live_metrics(
+def post_live_metrics(  # noqa: C901
     event_type: Literal["start", "data", "done"],
     baseline_sha: str,
     name: str,
     client: Literal["dvc", "dvclive"],
     experiment_rev: Optional[str] = None,
+    machine: Optional[Dict[str, Any]] = None,
+    message: Optional[str] = None,
     metrics: Optional[Dict[str, Any]] = None,
     params: Optional[Dict[str, Any]] = None,
     plots: Optional[Dict[str, Any]] = None,
     step: Optional[int] = None,
+    dvc_studio_config: Optional[Dict[str, Any]] = None,
+    offline: bool = False,
+    studio_token: Optional[str] = None,
+    studio_repo_url: Optional[str] = None,
+    studio_url: Optional[str] = None,
 ) -> Optional[bool]:
     """Post `event_type` to Studio's `api/live`.
 
-    Requires the environment variable `STUDIO_TOKEN` to be set.
-    If the environment variable `STUDIO_REPO_URL` is not set, will attempt to
+    Requires the environment variable `DVC_STUDIO_TOKEN` to be set.
+    If the environment variable `DVC_STUDIO_REPO_URL` is not set, will attempt to
     infer it from `git ls-remote --get-url`.
 
     Args:
@@ -89,6 +141,19 @@ def post_live_metrics(
             the experiment.
             Only used when `event_type="done"`.
             Only used when
+        machine (Optional[Dict[str, Any]]): Information about the machine
+            running the experiment.
+            Defaults to `None`.
+            ```
+            machine={
+                "cpu": 0.94
+                "memory": 0.99
+                "cloud": "aws"
+                "instance": "t2.micro"
+            }
+            ```
+        message: (Optional[str]): Custom message to be displayed as the commit
+            message in Studio UI.
         metrics (Optional[Dict[str, Any]]): Updates to DVC metric files.
             Defaults to `None`.
             Only used when `event_type="data"`.
@@ -117,28 +182,42 @@ def post_live_metrics(
             plots={
                 "dvclive/plots/metrics/foo.tsv": {
                     "data": [{"step": 0, "foo": 1.0}]
+                },
+                "dvclive/plots/images/bar.png": {
+                    "image": "base64-string"
                 }
             }
             ```
-        step: (Optional[int]): Current step of the training loop.
+        step (Optional[int]): Current step of the training loop.
             Usually comes from DVCLive `Live.step` property.
             Required in when `event_type="data"`.
             Defaults to `None`.
-
+        dvc_studio_config (Optional[Dict]): DVC config options for Studio.
+        offline (bool): Whether offline mode is enabled.
+        studio_token (Optional[str]): Studio access token obtained from the UI.
+        studio_repo_url (Optional[str]): URL of the Git repository that has been
+            imported into Studio UI.
+        studio_url (Optional[str]): Base URL of Studio UI (if self-hosted).
     Returns:
         Optional[bool]:
             `True` - if received status code 200 from Studio.
             `False` - if received other status code or RequestException raised.
             `None`- if prerequisites weren't met and the request was not sent.
     """
-    studio_token, studio_repo_url = get_studio_token_and_repo_url()
+    config = get_studio_config(
+        dvc_studio_config=dvc_studio_config,
+        offline=offline,
+        studio_token=studio_token,
+        studio_repo_url=studio_repo_url,
+        studio_url=studio_url,
+    )
 
-    if any(x is None for x in (studio_token, studio_repo_url)):
+    if not config:
         return None
 
     body = {
         "type": event_type,
-        "repo_url": studio_repo_url,
+        "repo_url": config["repo_url"],
         "baseline_sha": baseline_sha,
         "name": name,
         "client": client,
@@ -150,14 +229,20 @@ def post_live_metrics(
     if metrics:
         body["metrics"] = metrics
 
-    if event_type == "data":
+    if machine:
+        body["machine"] = machine
+
+    if event_type == "start":
+        if message:
+            # Cutting the message to match the commit title length limit.
+            body["message"] = message[:72]
+    elif event_type == "data":
         if step is None:
             logger.warning("Missing `step` in `data` event.")
             return None
         body["step"] = step
         if plots:
             body["plots"] = plots
-
     elif event_type == "done":
         if experiment_rev:
             body["experiment_rev"] = experiment_rev
@@ -173,24 +258,12 @@ def post_live_metrics(
         return None
 
     logger.debug(f"post_studio_live_metrics `{event_type=}`")
-    logger.debug(f"JSON body `{body=}`")
 
-    try:
-        response = requests.post(
-            getenv(STUDIO_ENDPOINT, "https://studio.iterative.ai/api/live"),
-            json=body,
-            headers={
-                "Content-type": "application/json",
-                "Authorization": f"token {studio_token}",
-            },
-            timeout=5,
-        )
-    except RequestException:
-        return False
+    path = getenv(STUDIO_ENDPOINT) or "api/live"
+    url = urljoin(config["url"], path)
+    token = config["token"]
 
-    message = response.content.decode()
-    logger.debug(
-        f"post_to_studio: {response.status_code=}" f", {message=}" if message else ""
-    )
+    if body["type"] != "data" or "plots" not in body:
+        return _single_post(url, body, token)
 
-    return response.status_code == 200
+    return _post_in_chunks(url, body, token)
