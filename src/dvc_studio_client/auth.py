@@ -84,7 +84,7 @@ def start_device_login(
     return d
 
 
-def check_token_authorization(*, uri: str, device_code: str) -> str | None:
+def check_token_authorization(*, uri: str, device_code: str) -> Optional[str]:
     """
     Checks the authorization status of a token based on a device code and
     returns access token upon successful authorization.
