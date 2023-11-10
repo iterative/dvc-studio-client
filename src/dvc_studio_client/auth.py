@@ -28,7 +28,7 @@ def start_device_login(
     client_name: str,
     base_url: str = None,
     token_name: Optional[str] = None,
-    scopes: List[str] | None = None,
+    scopes: Optional[List[str]] = None,
 ) -> DeviceLoginResponse:
     """
 
