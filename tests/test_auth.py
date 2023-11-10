@@ -2,21 +2,30 @@ import pytest
 import requests
 from requests import Response
 
-from dvc_studio_client.auth import start_device_login, check_token_authorization
+from dvc_studio_client.auth import start_device_login, check_token_authorization, DeviceLoginResponse
 
 
 def test_start_device_login(mocker):
+    example_response = {
+        "device_code": "random-device-code",
+        "user_code": "MOCKCODE",
+        "verification_uri": "http://example.com/verify",
+        "token_uri": "http://example.com/token",
+        "token_name": "token_name",
+        "expires_in": 1500,
+    }
     mock_post = mocker.patch(
         "requests.post",
-        return_value=mock_response(mocker, 200, {"user_code": "MOCKCODE"}),
+        return_value=mock_response(mocker, 200, example_response),
     )
 
-    start_device_login(
+    response: DeviceLoginResponse = start_device_login(
         base_url="https://example.com",
         client_name="dvc",
         token_name="token_name",
         scopes=["live"]
     )
+
     assert mock_post.called
     assert mock_post.call_args == mocker.call(
         url='https://example.com/api/device-login',
@@ -24,6 +33,7 @@ def test_start_device_login(mocker):
         headers={'Content-type': 'application/json'},
         timeout=5
     )
+    assert response == example_response
 
 
 def test_check_token_authorization_expired(mocker):
