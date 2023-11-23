@@ -3,6 +3,7 @@ import requests
 from requests import Response
 
 from dvc_studio_client.auth import (
+    AuthorizationExpired,
     DeviceLoginResponse,
     check_token_authorization,
     start_device_login,
@@ -50,12 +51,10 @@ def test_check_token_authorization_expired(mocker):
         ],
     )
 
-    assert (
+    with pytest.raises(AuthorizationExpired):
         check_token_authorization(
             uri="https://example.com/token_uri", device_code="random_device_code"
         )
-        is None
-    )
 
     assert mock_post.call_count == 2
     assert mock_post.call_args == mocker.call(
