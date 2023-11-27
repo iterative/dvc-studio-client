@@ -30,7 +30,9 @@ class AuthorizationExpired(StudioAuthError):
     pass
 
 
-def get_access_token(*, hostname, token_name=None,  scopes="", use_device_code=False, client_name="client"):
+def get_access_token(
+    *, hostname, token_name=None, scopes="", use_device_code=False, client_name="client"
+):
     """Initiate Authorization
 
     This method initiates the authorization process for a client application.
@@ -40,7 +42,8 @@ def get_access_token(*, hostname, token_name=None,  scopes="", use_device_code=F
     Parameters:
         token_name (str): The name of the client application.
         hostname (str): The base URL of the application.
-        scopes (str, optional): A comma-separated string of scopes that the application requires. Default is empty.
+        scopes (str, optional): A comma-separated string of scopes that
+        the application requires. Default is empty.
         use_device_code (bool, optional): Whether to use the device code
         flow for authorization. Default is False.
         client_name (str, optional): Client name
@@ -119,7 +122,9 @@ def start_device_login(
         "Starting device login for Studio%s",
         f" ({base_url})" if base_url else "",
     )
-    if invalid_scopes := list(filter(lambda s: s.upper() not in AVAILABLE_SCOPES, scopes)):
+    if invalid_scopes := list(
+        filter(lambda s: s.upper() not in AVAILABLE_SCOPES, scopes)
+    ):
         raise InvalidScopesError(
             f"Following scopes are not valid: {', '.join(invalid_scopes)}"
         )

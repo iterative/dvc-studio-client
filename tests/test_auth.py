@@ -5,8 +5,10 @@ from requests import Response
 from dvc_studio_client.auth import (
     AuthorizationExpired,
     DeviceLoginResponse,
+    InvalidScopesError,
     check_token_authorization,
-    start_device_login, get_access_token, InvalidScopesError,
+    get_access_token,
+    start_device_login,
 )
 
 MOCK_RESPONSE = {
@@ -34,9 +36,7 @@ def mock_post(mocker, mock_response):
     def _mock_post(method, side_effect):
         return mocker.patch(
             method,
-            side_effect=[
-                mock_response(status, resp) for status, resp in side_effect
-            ],
+            side_effect=[mock_response(status, resp) for status, resp in side_effect],
         )
 
     return _mock_post
@@ -45,13 +45,10 @@ def mock_post(mocker, mock_response):
 def test_auth_expired(mocker, mock_post):
     mocker.patch("webbrowser.open")
 
-    mock_login_post = mock_post(
-        "requests.post", [(200, MOCK_RESPONSE)]
-    )
+    mock_login_post = mock_post("requests.post", [(200, MOCK_RESPONSE)])
 
     mock_poll_post = mock_post(
-        "requests.Session.post",
-        [(400, {"detail": "authorization_expired"})]
+        "requests.Session.post", [(400, {"detail": "authorization_expired"})]
     )
 
     with pytest.raises(AuthorizationExpired):
@@ -79,9 +76,7 @@ def test_auth_expired(mocker, mock_post):
 def test_auth_success(mocker, mock_post, capfd):
     mocker.patch("time.sleep")
     mocker.patch("webbrowser.open")
-    mock_login_post = mock_post(
-        "requests.post", [(200, MOCK_RESPONSE)]
-    )
+    mock_login_post = mock_post("requests.post", [(200, MOCK_RESPONSE)])
     mock_poll_post = mock_post(
         "requests.Session.post",
         [
@@ -90,13 +85,18 @@ def test_auth_success(mocker, mock_post, capfd):
         ],
     )
 
-    assert get_access_token(hostname="https://example.com", scopes="experiments", token_name="random-name") == (
-    "random-name", "isat_access_token")
+    assert get_access_token(
+        hostname="https://example.com", scopes="experiments", token_name="random-name"
+    ) == ("random-name", "isat_access_token")
 
     assert mock_login_post.call_args_list == [
         mocker.call(
             url="https://example.com/api/device-login",
-            json={"client_name": "client", "token_name": "random-name", "scopes": ["experiments"]},
+            json={
+                "client_name": "client",
+                "token_name": "random-name",
+                "scopes": ["experiments"],
+            },
             headers={"Content-type": "application/json"},
             timeout=5,
         )
@@ -104,13 +104,13 @@ def test_auth_success(mocker, mock_post, capfd):
     assert mock_poll_post.call_count == 2
     assert mock_poll_post.call_args_list == [
         mocker.call(
-            f"https://studio.example.com/api/device-login/token",
+            "https://studio.example.com/api/device-login/token",
             json={"code": "random-value"},
             timeout=5,
             allow_redirects=False,
         ),
         mocker.call(
-            f"https://studio.example.com/api/device-login/token",
+            "https://studio.example.com/api/device-login/token",
             json={"code": "random-value"},
             timeout=5,
             allow_redirects=False,
@@ -124,9 +124,7 @@ def test_webbrowser_open_fails(mocker, mock_post, capfd):
     mock_open.return_value = False
 
     mocker.patch("time.sleep")
-    mock_post(
-        "requests.post", [(200, MOCK_RESPONSE)]
-    )
+    mock_post("requests.post", [(200, MOCK_RESPONSE)])
     mock_post(
         "requests.Session.post",
         [
@@ -150,10 +148,7 @@ def test_start_device_login(mocker, mock_post):
         "token_name": "token_name",
         "expires_in": 1500,
     }
-    mock_post = mock_post(
-        "requests.post",
-        [(200, example_response)]
-    )
+    mock_post = mock_post("requests.post", [(200, example_response)])
 
     response: DeviceLoginResponse = start_device_login(
         base_url="https://example.com",
@@ -165,7 +160,11 @@ def test_start_device_login(mocker, mock_post):
     assert mock_post.called
     assert mock_post.call_args == mocker.call(
         url="https://example.com/api/device-login",
-        json={"client_name": "dvc", "token_name": "token_name", "scopes": ["EXPERIMENTS"]},
+        json={
+            "client_name": "dvc",
+            "token_name": "token_name",
+            "scopes": ["EXPERIMENTS"],
+        },
         headers={"Content-type": "application/json"},
         timeout=5,
     )
@@ -242,10 +241,10 @@ def test_check_token_authorization_success(mocker, mock_post):
     )
 
     assert (
-            check_token_authorization(
-                uri="https://example.com/token_uri", device_code="random_device_code"
-            )
-            == "isat_token"
+        check_token_authorization(
+            uri="https://example.com/token_uri", device_code="random_device_code"
+        )
+        == "isat_token"
     )
 
     assert mock_post_call.call_count == 3
