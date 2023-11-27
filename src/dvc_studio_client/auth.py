@@ -6,7 +6,7 @@ from requests.adapters import HTTPAdapter
 
 from . import logger
 
-AVAILABLE_SCOPES = ["live", "dvc_experiment", "view_url", "dql", "download_model"]
+AVAILABLE_SCOPES = ["EXPERIMENTS", "DATASETS", "MODELS"]
 
 
 class DeviceLoginResponse(TypedDict):
@@ -30,7 +30,7 @@ class AuthorizationExpired(StudioAuthError):
     pass
 
 
-def initiate_authorization(*, name, hostname, scopes, use_device_code=False):
+def get_access_token(*, hostname, token_name=None,  scopes="", use_device_code=False, client_name="client"):
     """Initiate Authorization
 
     This method initiates the authorization process for a client application.
@@ -38,11 +38,12 @@ def initiate_authorization(*, name, hostname, scopes, use_device_code=False):
     access in order to authorize the application.
 
     Parameters:
-        name (str): The name of the client application.
+        token_name (str): The name of the client application.
         hostname (str): The base URL of the application.
-        scopes (str): A comma-separated string of scopes that the application requires.
+        scopes (str, optional): A comma-separated string of scopes that the application requires. Default is empty.
         use_device_code (bool, optional): Whether to use the device code
         flow for authorization. Default is False.
+        client_name (str, optional): Client name
 
     Returns:
         tuple: A tuple containing the token name and the access token.
@@ -53,10 +54,10 @@ def initiate_authorization(*, name, hostname, scopes, use_device_code=False):
     import webbrowser
 
     response = start_device_login(
-        client_name="dvc",
+        client_name=client_name,
         base_url=hostname,
-        token_name=name,
-        scopes=scopes.split(","),
+        token_name=token_name,
+        scopes=scopes.split(",") if scopes else [],
     )
     verification_uri = response["verification_uri"]
     user_code = response["user_code"]
@@ -66,16 +67,18 @@ def initiate_authorization(*, name, hostname, scopes, use_device_code=False):
 
     opened = False
     if not use_device_code:
+        url = f"{verification_uri}?code={user_code}"
+        opened = webbrowser.open(url)
+
+    if opened:
         print(
             f"A web browser has been opened at \n{verification_uri}.\n"
             f"Please continue the login in the web browser.\n"
             f"If no web browser is available or if the web browser fails to open,\n"
             f"use device code flow with `dvc studio login --use-device-code`."
         )
-        url = f"{verification_uri}?code={user_code}"
-        opened = webbrowser.open(url)
 
-    if not opened:
+    else:
         print(f"Please open the following url in your browser.\n{verification_uri}")
         print(f"And enter the user code below {user_code} to authorize.")
 
@@ -116,7 +119,7 @@ def start_device_login(
         "Starting device login for Studio%s",
         f" ({base_url})" if base_url else "",
     )
-    if invalid_scopes := list(filter(lambda s: s not in AVAILABLE_SCOPES, scopes)):
+    if invalid_scopes := list(filter(lambda s: s.upper() not in AVAILABLE_SCOPES, scopes)):
         raise InvalidScopesError(
             f"Following scopes are not valid: {', '.join(invalid_scopes)}"
         )

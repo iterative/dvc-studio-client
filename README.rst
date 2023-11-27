@@ -41,6 +41,9 @@ Features
 - Live Experiments
    - `post_live_metrics`_: Post updates to `api/live`.
 
+- Studio authorization
+    - `initiate_authorization`_: Initiates the authorization process for a client application
+
 Installation
 ------------
 
@@ -73,3 +76,4 @@ please `file an issue`_ along with a detailed description.
 .. _DVC Studio: https://dvc.org/doc/studio
 .. _get_download_uris: https://docs.iterative.ai/dvc-studio-client/reference/dvc_studio_client/model_registry/
 .. _post_live_metrics: https://docs.iterative.ai/dvc-studio-client/reference/dvc_studio_client/post_live_metrics/
+.. _initiate_authorization: https://docs.iterative.ai/dvc-studio-client/reference/dvc_studio_client/auth/
