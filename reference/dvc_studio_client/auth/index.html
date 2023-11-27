@@ -381,8 +381,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dvc_studio_client.auth.initiate_authorization" class="md-nav__link">
-    initiate_authorization()
+  <a href="#dvc_studio_client.auth.get_access_token" class="md-nav__link">
+    get_access_token()
   </a>
   
 </li>
@@ -557,8 +557,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dvc_studio_client.auth.initiate_authorization" class="md-nav__link">
-    initiate_authorization()
+  <a href="#dvc_studio_client.auth.get_access_token" class="md-nav__link">
+    get_access_token()
   </a>
   
 </li>
@@ -644,15 +644,7 @@ else:
 
           <details class="quote">
             <summary>Source code in <code>dvc_studio_client/auth.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">158</span>
 <span class="normal">159</span>
 <span class="normal">160</span>
 <span class="normal">161</span>
@@ -699,7 +691,15 @@ else:
 <span class="normal">202</span>
 <span class="normal">203</span>
 <span class="normal">204</span>
-<span class="normal">205</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">check_token_authorization</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">device_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">check_token_authorization</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">device_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks the authorization status of a token based on a device code and</span>
 <span class="sd">    returns access token upon successful authorization.</span>
@@ -767,8 +767,8 @@ else:
 
 
 
-<h2 id="dvc_studio_client.auth.initiate_authorization" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">initiate_authorization</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">scopes</span><span class="p">,</span> <span class="n">use_device_code</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+<h2 id="dvc_studio_client.auth.get_access_token" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">get_access_token</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">token_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scopes</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">use_device_code</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">client_name</span><span class="o">=</span><span class="s1">&#39;client&#39;</span><span class="p">)</span></code>
 
 </h2>
 
@@ -794,7 +794,7 @@ access in order to authorize the application.</p>
     </thead>
     <tbody>
         <tr>
-          <td><code>name</code></td>
+          <td><code>token_name</code></td>
           <td>
                 <code>str</code>
           </td>
@@ -804,7 +804,7 @@ access in order to authorize the application.</p>
             </div>
           </td>
           <td>
-              <em>required</em>
+                <code>None</code>
           </td>
         </tr>
         <tr>
@@ -828,11 +828,11 @@ access in order to authorize the application.</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>A comma-separated string of scopes that the application requires.</p>
+              <p>A comma-separated string of scopes that</p>
             </div>
           </td>
           <td>
-              <em>required</em>
+                <code>&#39;&#39;</code>
           </td>
         </tr>
         <tr>
@@ -847,6 +847,20 @@ access in order to authorize the application.</p>
           </td>
           <td>
                 <code>False</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>client_name</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Client name</p>
+            </div>
+          </td>
+          <td>
+                <code>&#39;client&#39;</code>
           </td>
         </tr>
     </tbody>
@@ -946,7 +960,15 @@ access in order to authorize the application.</p>
 <span class="normal">81</span>
 <span class="normal">82</span>
 <span class="normal">83</span>
-<span class="normal">84</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">initiate_authorization</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">scopes</span><span class="p">,</span> <span class="n">use_device_code</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_access_token</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">token_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scopes</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">use_device_code</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">client_name</span><span class="o">=</span><span class="s2">&quot;client&quot;</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initiate Authorization</span>
 
 <span class="sd">    This method initiates the authorization process for a client application.</span>
@@ -954,11 +976,13 @@ access in order to authorize the application.</p>
 <span class="sd">    access in order to authorize the application.</span>
 
 <span class="sd">    Parameters:</span>
-<span class="sd">        name (str): The name of the client application.</span>
+<span class="sd">        token_name (str): The name of the client application.</span>
 <span class="sd">        hostname (str): The base URL of the application.</span>
-<span class="sd">        scopes (str): A comma-separated string of scopes that the application requires.</span>
+<span class="sd">        scopes (str, optional): A comma-separated string of scopes that</span>
+<span class="sd">        the application requires. Default is empty.</span>
 <span class="sd">        use_device_code (bool, optional): Whether to use the device code</span>
 <span class="sd">        flow for authorization. Default is False.</span>
+<span class="sd">        client_name (str, optional): Client name</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        tuple: A tuple containing the token name and the access token.</span>
@@ -969,10 +993,10 @@ access in order to authorize the application.</p>
     <span class="kn">import</span> <span class="nn">webbrowser</span>
 
     <span class="n">response</span> <span class="o">=</span> <span class="n">start_device_login</span><span class="p">(</span>
-        <span class="n">client_name</span><span class="o">=</span><span class="s2">&quot;dvc&quot;</span><span class="p">,</span>
+        <span class="n">client_name</span><span class="o">=</span><span class="n">client_name</span><span class="p">,</span>
         <span class="n">base_url</span><span class="o">=</span><span class="n">hostname</span><span class="p">,</span>
-        <span class="n">token_name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-        <span class="n">scopes</span><span class="o">=</span><span class="n">scopes</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">),</span>
+        <span class="n">token_name</span><span class="o">=</span><span class="n">token_name</span><span class="p">,</span>
+        <span class="n">scopes</span><span class="o">=</span><span class="n">scopes</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">scopes</span> <span class="k">else</span> <span class="p">[],</span>
     <span class="p">)</span>
     <span class="n">verification_uri</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;verification_uri&quot;</span><span class="p">]</span>
     <span class="n">user_code</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;user_code&quot;</span><span class="p">]</span>
@@ -982,16 +1006,18 @@ access in order to authorize the application.</p>
 
     <span class="n">opened</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">use_device_code</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">verification_uri</span><span class="si">}</span><span class="s2">?code=</span><span class="si">{</span><span class="n">user_code</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">opened</span> <span class="o">=</span> <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">opened</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;A web browser has been opened at </span><span class="se">\n</span><span class="si">{</span><span class="n">verification_uri</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;Please continue the login in the web browser.</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;If no web browser is available or if the web browser fails to open,</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;use device code flow with `dvc studio login --use-device-code`.&quot;</span>
         <span class="p">)</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">verification_uri</span><span class="si">}</span><span class="s2">?code=</span><span class="si">{</span><span class="n">user_code</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="n">opened</span> <span class="o">=</span> <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">opened</span><span class="p">:</span>
+    <span class="k">else</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Please open the following url in your browser.</span><span class="se">\n</span><span class="si">{</span><span class="n">verification_uri</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;And enter the user code below </span><span class="si">{</span><span class="n">user_code</span><span class="si">}</span><span class="s2"> to authorize.&quot;</span><span class="p">)</span>
 
@@ -1034,13 +1060,7 @@ access in order to authorize the application.</p>
 
           <details class="quote">
             <summary>Source code in <code>dvc_studio_client/auth.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 87</span>
-<span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 93</span>
 <span class="normal"> 94</span>
 <span class="normal"> 95</span>
 <span class="normal"> 96</span>
@@ -1094,7 +1114,15 @@ access in order to authorize the application.</p>
 <span class="normal">144</span>
 <span class="normal">145</span>
 <span class="normal">146</span>
-<span class="normal">147</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">start_device_login</span><span class="p">(</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">start_device_login</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">client_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">base_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1126,7 +1154,9 @@ access in order to authorize the application.</p>
         <span class="s2">&quot;Starting device login for Studio</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">if</span> <span class="n">base_url</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">if</span> <span class="n">invalid_scopes</span> <span class="o">:=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AVAILABLE_SCOPES</span><span class="p">,</span> <span class="n">scopes</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="n">invalid_scopes</span> <span class="o">:=</span> <span class="nb">list</span><span class="p">(</span>
+        <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AVAILABLE_SCOPES</span><span class="p">,</span> <span class="n">scopes</span><span class="p">)</span>
+    <span class="p">):</span>
         <span class="k">raise</span> <span class="n">InvalidScopesError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Following scopes are not valid: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">invalid_scopes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
