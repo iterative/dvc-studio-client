@@ -3,10 +3,10 @@ import requests
 from requests import Response
 
 from dvc_studio_client.auth import (
-    AuthorizationExpired,
+    AuthenticationExpired,
     DeviceLoginResponse,
     InvalidScopesError,
-    check_token_authorization,
+    check_token_authentication,
     get_access_token,
     start_device_login,
 )
@@ -51,7 +51,7 @@ def test_auth_expired(mocker, mock_post):
         "requests.Session.post", [(400, {"detail": "authorization_expired"})]
     )
 
-    with pytest.raises(AuthorizationExpired):
+    with pytest.raises(AuthenticationExpired):
         get_access_token(client_name="client", hostname="https://studio.example.com")
 
     assert mock_login_post.call_args == mocker.call(
@@ -191,8 +191,8 @@ def test_check_token_authorization_expired(mocker, mock_post):
         ],
     )
 
-    with pytest.raises(AuthorizationExpired):
-        check_token_authorization(
+    with pytest.raises(AuthenticationExpired):
+        check_token_authentication(
             uri="https://example.com/token_uri", device_code="random_device_code"
         )
 
@@ -205,7 +205,7 @@ def test_check_token_authorization_expired(mocker, mock_post):
     )
 
 
-def test_check_token_authorization_error(mocker, mock_post):
+def test_check_token_authentication_error(mocker, mock_post):
     mocker.patch("time.sleep")
     mock_post = mock_post(
         "requests.Session.post",
@@ -216,7 +216,7 @@ def test_check_token_authorization_error(mocker, mock_post):
     )
 
     with pytest.raises(requests.RequestException):
-        check_token_authorization(
+        check_token_authentication(
             uri="https://example.com/token_uri", device_code="random_device_code"
         )
 
@@ -229,7 +229,7 @@ def test_check_token_authorization_error(mocker, mock_post):
     )
 
 
-def test_check_token_authorization_success(mocker, mock_post):
+def test_check_token_authentication_success(mocker, mock_post):
     mocker.patch("time.sleep")
     mock_post_call = mock_post(
         "requests.Session.post",
@@ -241,7 +241,7 @@ def test_check_token_authorization_success(mocker, mock_post):
     )
 
     assert (
-        check_token_authorization(
+        check_token_authentication(
             uri="https://example.com/token_uri", device_code="random_device_code"
         )
         == "isat_token"
