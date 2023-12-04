@@ -374,8 +374,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dvc_studio_client.auth.check_token_authorization" class="md-nav__link">
-    check_token_authorization()
+  <a href="#dvc_studio_client.auth.check_token_authentication" class="md-nav__link">
+    check_token_authentication()
   </a>
   
 </li>
@@ -550,8 +550,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dvc_studio_client.auth.check_token_authorization" class="md-nav__link">
-    check_token_authorization()
+  <a href="#dvc_studio_client.auth.check_token_authentication" class="md-nav__link">
+    check_token_authentication()
   </a>
   
 </li>
@@ -615,31 +615,31 @@
 
 
 
-<h2 id="dvc_studio_client.auth.check_token_authorization" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">check_token_authorization</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">device_code</span><span class="p">)</span></code>
+<h2 id="dvc_studio_client.auth.check_token_authentication" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">check_token_authentication</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">device_code</span><span class="p">)</span></code>
 
 </h2>
 
 
   <div class="doc doc-contents ">
   
-      <p>Checks the authorization status of a token based on a device code and
-returns access token upon successful authorization.</p>
+      <p>Checks the authentication status of a token based on a device code and
+returns access token upon successful authentication.</p>
 <p>Parameters:
 - uri (str): The token uri to send the request to.
-- device_code (str): The device code to check authorization for.</p>
+- device_code (str): The device code to check authentication for.</p>
 <p>Returns:
 - str | None: The access token if authorized, otherwise None.</p>
 <p>Raises:
 - requests.HTTPError: If the status code of the response is not 200.</p>
 <p>Example Usage:</p>
-<pre><code>token = check_token_authorization(
+<pre><code>token = check_token_authentication(
     uri=&quot;https://example.com/api/&quot;, device_code=&quot;1234567890&quot;
 )
 if token is not None:
     print(&quot;Access token:&quot;, token)
 else:
-    print(&quot;Authorization expired.&quot;)
+    print(&quot;Authentication expired.&quot;)
 </code></pre>
 
           <details class="quote">
@@ -699,14 +699,14 @@ else:
 <span class="normal">210</span>
 <span class="normal">211</span>
 <span class="normal">212</span>
-<span class="normal">213</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">check_token_authorization</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">device_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">213</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">check_token_authentication</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">device_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Checks the authorization status of a token based on a device code and</span>
-<span class="sd">    returns access token upon successful authorization.</span>
+<span class="sd">    Checks the authentication status of a token based on a device code and</span>
+<span class="sd">    returns access token upon successful authentication.</span>
 
 <span class="sd">    Parameters:</span>
 <span class="sd">    - uri (str): The token uri to send the request to.</span>
-<span class="sd">    - device_code (str): The device code to check authorization for.</span>
+<span class="sd">    - device_code (str): The device code to check authentication for.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">    - str | None: The access token if authorized, otherwise None.</span>
@@ -716,13 +716,13 @@ else:
 
 <span class="sd">    Example Usage:</span>
 <span class="sd">    ```</span>
-<span class="sd">    token = check_token_authorization(</span>
+<span class="sd">    token = check_token_authentication(</span>
 <span class="sd">        uri=&quot;https://example.com/api/&quot;, device_code=&quot;1234567890&quot;</span>
 <span class="sd">    )</span>
 <span class="sd">    if token is not None:</span>
 <span class="sd">        print(&quot;Access token:&quot;, token)</span>
 <span class="sd">    else:</span>
-<span class="sd">        print(&quot;Authorization expired.&quot;)</span>
+<span class="sd">        print(&quot;Authentication expired.&quot;)</span>
 <span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">time</span>
@@ -748,7 +748,7 @@ else:
                 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">detail</span> <span class="o">==</span> <span class="s2">&quot;authorization_expired&quot;</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">AuthorizationExpired</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">AuthenticationExpired</span><span class="p">(</span>
                     <span class="s2">&quot;failed to authenticate: This &#39;device_code&#39; has expired.&quot;</span>
                 <span class="p">)</span>
 
@@ -775,8 +775,8 @@ else:
 
   <div class="doc doc-contents ">
   
-      <p>Initiate Authorization</p>
-<p>This method initiates the authorization process for a client application.
+      <p>Initiate Authentication</p>
+<p>This method initiates the authentication process for a client application.
 It generates a user code and a verification URI that the user needs to
 access in order to authorize the application.</p>
 
@@ -969,9 +969,9 @@ access in order to authorize the application.</p>
 <span class="normal">90</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_access_token</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">token_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scopes</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">use_device_code</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">client_name</span><span class="o">=</span><span class="s2">&quot;client&quot;</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initiate Authorization</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initiate Authentication</span>
 
-<span class="sd">    This method initiates the authorization process for a client application.</span>
+<span class="sd">    This method initiates the authentication process for a client application.</span>
 <span class="sd">    It generates a user code and a verification URI that the user needs to</span>
 <span class="sd">    access in order to authorize the application.</span>
 
@@ -981,7 +981,7 @@ access in order to authorize the application.</p>
 <span class="sd">        scopes (str, optional): A comma-separated string of scopes that</span>
 <span class="sd">        the application requires. Default is empty.</span>
 <span class="sd">        use_device_code (bool, optional): Whether to use the device code</span>
-<span class="sd">        flow for authorization. Default is False.</span>
+<span class="sd">        flow for authentication. Default is False.</span>
 <span class="sd">        client_name (str, optional): Client name</span>
 
 <span class="sd">    Returns:</span>
@@ -1021,7 +1021,7 @@ access in order to authorize the application.</p>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Please open the following url in your browser.</span><span class="se">\n</span><span class="si">{</span><span class="n">verification_uri</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;And enter the user code below </span><span class="si">{</span><span class="n">user_code</span><span class="si">}</span><span class="s2"> to authorize.&quot;</span><span class="p">)</span>
 
-    <span class="n">access_token</span> <span class="o">=</span> <span class="n">check_token_authorization</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">token_uri</span><span class="p">,</span> <span class="n">device_code</span><span class="o">=</span><span class="n">device_code</span><span class="p">)</span>
+    <span class="n">access_token</span> <span class="o">=</span> <span class="n">check_token_authentication</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">token_uri</span><span class="p">,</span> <span class="n">device_code</span><span class="o">=</span><span class="n">device_code</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">token_name</span><span class="p">,</span> <span class="n">access_token</span>
 </code></pre></div></td></tr></table></div>
