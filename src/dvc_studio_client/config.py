@@ -24,7 +24,11 @@ def _get_remote_url() -> str:
         except IndexError:
             # IndexError happens when the head is detached
             _remote, url = get_remote_repo(repo, b"origin")
-        return url
+        # Dulwich returns (None, "origin") if no remote set
+        if (_remote, url) == (None, "origin"):
+            logger.warning("No Git remote. Can't infer Studio repo URL.")
+        else:
+            return url
 
 
 @lru_cache(maxsize=1)
