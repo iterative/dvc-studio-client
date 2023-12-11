@@ -15,12 +15,19 @@ from dvc_studio_client.env import (
 )
 
 
-def test_get_url(monkeypatch, tmp_path_factory):
+def test_get_remote_url(monkeypatch, tmp_path_factory):
     source = os.fspath(tmp_path_factory.mktemp("source"))
     target = os.fspath(tmp_path_factory.mktemp("target"))
     with init(source), clone(source, target):
         monkeypatch.chdir(target)
         assert _get_remote_url() == source
+
+
+def test_get_remote_url_no_remote(monkeypatch, tmp_path_factory):
+    target = os.fspath(tmp_path_factory.mktemp("target"))
+    with init(target):
+        monkeypatch.chdir(target)
+        assert _get_remote_url() is None
 
 
 @pytest.mark.parametrize(
