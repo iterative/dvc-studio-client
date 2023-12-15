@@ -38,9 +38,9 @@ def get_access_token(
     use_device_code=False,
     client_name="client",
 ):
-    """Initiate Authorization
+    """Initiate Authentication
 
-    This method initiates the authorization process for a client application.
+    This method initiates the authentication process for a client application.
     It generates a user code and a verification URI that the user needs to
     access in order to authorize the application.
 
@@ -51,7 +51,7 @@ def get_access_token(
         scopes (str, optional): A comma-separated string of scopes that
         the application requires. Default is empty.
         use_device_code (bool, optional): Whether to use the device code
-        flow for authorization. Default is False.
+        flow for authentication. Default is False.
         client_name (str, optional): Client name
 
     Returns
@@ -91,7 +91,7 @@ def get_access_token(
         print(f"Please open the following url in your browser.\n{verification_uri}")  # noqa: T201
         print(f"And enter the user code below {user_code} to authorize.")  # noqa: T201
 
-    access_token = check_token_authorization(uri=token_uri, device_code=device_code)
+    access_token = check_token_authentication(uri=token_uri, device_code=device_code)
 
     return token_name, access_token
 
@@ -162,14 +162,15 @@ def start_device_login(
     return d
 
 
-def check_token_authorization(*, uri: str, device_code: str) -> Optional[str]:
-    """Checks the authorization status of a token based on a device code and
-    returns access token upon successful authorization.
+def check_token_authentication(*, uri: str, device_code: str) -> Optional[str]:
+    """
+    Checks the authentication status of a token based on a device code and
+    returns access token upon successful authentication.
 
     Parameters
     ----------
     - uri (str): The token uri to send the request to.
-    - device_code (str): The device code to check authorization for.
+    - device_code (str): The device code to check authentication for.
 
     Returns
     -------
@@ -181,13 +182,13 @@ def check_token_authorization(*, uri: str, device_code: str) -> Optional[str]:
 
     Example Usage:
     ```
-    token = check_token_authorization(
+    token = check_token_authentication(
         uri="https://example.com/api/", device_code="1234567890"
     )
     if token is not None:
         print("Access token:", token)
     else:
-        print("Authorization expired.")
+        print("Authentication expired.")
     ```
     """
     import time

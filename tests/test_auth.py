@@ -3,7 +3,7 @@ import requests
 from dvc_studio_client.auth import (
     AuthorizationExpiredError,
     InvalidScopesError,
-    check_token_authorization,
+    check_token_authentication,
     get_access_token,
     start_device_login,
 )
@@ -184,7 +184,7 @@ def test_start_device_login_invalid_scopes(mock_post):
         )
 
 
-def test_check_token_authorization_expired(mocker, mock_post):
+def test_check_token_authentication_expired(mocker, mock_post):
     mocker.patch("time.sleep")
     mock_post = mock_post(
         "requests.Session.post",
@@ -195,7 +195,7 @@ def test_check_token_authorization_expired(mocker, mock_post):
     )
 
     with pytest.raises(AuthorizationExpiredError):
-        check_token_authorization(
+        check_token_authentication(
             uri="https://example.com/token_uri",
             device_code="random_device_code",
         )
@@ -209,7 +209,7 @@ def test_check_token_authorization_expired(mocker, mock_post):
     )
 
 
-def test_check_token_authorization_error(mocker, mock_post):
+def test_check_token_authentication_error(mocker, mock_post):
     mocker.patch("time.sleep")
     mock_post = mock_post(
         "requests.Session.post",
@@ -220,7 +220,7 @@ def test_check_token_authorization_error(mocker, mock_post):
     )
 
     with pytest.raises(requests.RequestException):
-        check_token_authorization(
+        check_token_authentication(
             uri="https://example.com/token_uri",
             device_code="random_device_code",
         )
@@ -234,7 +234,7 @@ def test_check_token_authorization_error(mocker, mock_post):
     )
 
 
-def test_check_token_authorization_success(mocker, mock_post):
+def test_check_token_authentication_success(mocker, mock_post):
     mocker.patch("time.sleep")
     mock_post_call = mock_post(
         "requests.Session.post",
@@ -246,7 +246,7 @@ def test_check_token_authorization_success(mocker, mock_post):
     )
 
     assert (
-        check_token_authorization(
+        check_token_authentication(
             uri="https://example.com/token_uri",
             device_code="random_device_code",
         )
