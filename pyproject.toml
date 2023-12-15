@@ -20,7 +20,10 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dynamic = ["version"]
-dependencies = []
+dependencies = [
+    "dulwich",
+    "requests",
+]
 
 [project.urls]
 Issues = "https://github.com/iterative/dvc-studio-client/issues"
