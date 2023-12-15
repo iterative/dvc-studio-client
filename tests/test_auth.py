@@ -1,15 +1,13 @@
 import pytest
 import requests
-from requests import Response
-
 from dvc_studio_client.auth import (
-    AuthorizationExpired,
-    DeviceLoginResponse,
+    AuthorizationExpiredError,
     InvalidScopesError,
     check_token_authorization,
     get_access_token,
     start_device_login,
 )
+from requests import Response
 
 MOCK_RESPONSE = {
     "verification_uri": "https://studio.example.com/auth/device-login",
@@ -20,7 +18,7 @@ MOCK_RESPONSE = {
 }
 
 
-@pytest.fixture
+@pytest.fixture()
 def mock_response(mocker):
     def _mock_response(status_code, json):
         response = Response()
@@ -31,7 +29,7 @@ def mock_response(mocker):
     return _mock_response
 
 
-@pytest.fixture
+@pytest.fixture()
 def mock_post(mocker, mock_response):
     def _mock_post(method, side_effect):
         return mocker.patch(
@@ -48,10 +46,11 @@ def test_auth_expired(mocker, mock_post):
     mock_login_post = mock_post("requests.post", [(200, MOCK_RESPONSE)])
 
     mock_poll_post = mock_post(
-        "requests.Session.post", [(400, {"detail": "authorization_expired"})]
+        "requests.Session.post",
+        [(400, {"detail": "authorization_expired"})],
     )
 
-    with pytest.raises(AuthorizationExpired):
+    with pytest.raises(AuthorizationExpiredError):
         get_access_token(client_name="client", hostname="https://studio.example.com")
 
     assert mock_login_post.call_args == mocker.call(
@@ -86,7 +85,9 @@ def test_auth_success(mocker, mock_post, capfd):
     )
 
     assert get_access_token(
-        hostname="https://example.com", scopes="experiments", token_name="random-name"
+        hostname="https://example.com",
+        scopes="experiments",
+        token_name="random-name",
     ) == ("random-name", "isat_access_token")
 
     assert mock_login_post.call_args_list == [
@@ -99,7 +100,7 @@ def test_auth_success(mocker, mock_post, capfd):
             },
             headers={"Content-type": "application/json"},
             timeout=5,
-        )
+        ),
     ]
     assert mock_poll_post.call_count == 2
     assert mock_poll_post.call_args_list == [
@@ -134,7 +135,9 @@ def test_webbrowser_open_fails(mocker, mock_post, capfd):
     )
 
     assert get_access_token(
-        hostname="https://example.com", scopes="experiments", token_name="random-name"
+        hostname="https://example.com",
+        scopes="experiments",
+        token_name="random-name",
     ) == ("random-name", "isat_access_token")
     assert "Please open the following url in your browser" in capfd.readouterr().out
 
@@ -150,7 +153,7 @@ def test_start_device_login(mocker, mock_post):
     }
     mock_post = mock_post("requests.post", [(200, example_response)])
 
-    response: DeviceLoginResponse = start_device_login(
+    response = start_device_login(
         base_url="https://example.com",
         client_name="dvc",
         token_name="token_name",
@@ -191,9 +194,10 @@ def test_check_token_authorization_expired(mocker, mock_post):
         ],
     )
 
-    with pytest.raises(AuthorizationExpired):
+    with pytest.raises(AuthorizationExpiredError):
         check_token_authorization(
-            uri="https://example.com/token_uri", device_code="random_device_code"
+            uri="https://example.com/token_uri",
+            device_code="random_device_code",
         )
 
     assert mock_post.call_count == 2
@@ -217,7 +221,8 @@ def test_check_token_authorization_error(mocker, mock_post):
 
     with pytest.raises(requests.RequestException):
         check_token_authorization(
-            uri="https://example.com/token_uri", device_code="random_device_code"
+            uri="https://example.com/token_uri",
+            device_code="random_device_code",
         )
 
     assert mock_post.call_count == 2
@@ -242,7 +247,8 @@ def test_check_token_authorization_success(mocker, mock_post):
 
     assert (
         check_token_authorization(
-            uri="https://example.com/token_uri", device_code="random_device_code"
+            uri="https://example.com/token_uri",
+            device_code="random_device_code",
         )
         == "isat_token"
     )

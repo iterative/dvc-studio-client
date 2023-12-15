@@ -52,24 +52,28 @@ def get_studio_config(
     """Get studio config options.
 
     Args:
+    ----
         dvc_studio_config (Optional[dict]): Dict returned by dvc.Repo.config["studio"].
         offline (bool): Whether offline mode is enabled. Default: false.
         studio_token (Optional[str]): Studio access token obtained from the UI.
         studio_repo_url (Optional[str]): URL of the Git repository that has been
             imported into Studio UI.
         studio_url (Optional[str]): Base URL of Studio UI (if self-hosted).
+
     Returns:
+    -------
         Dict:
             Config options for posting live metrics.
             Keys match the DVC studio config section.
-            Example:
+
+    Example:
+    -------
                 {
                     "token": "mytoken",
                     "repo_url": "git@github.com:iterative/dvc-studio-client.git",
                     "url": "https://studio.iterative.ai",
                 }
     """
-
     config = {}
     if not dvc_studio_config:
         dvc_studio_config = {}
@@ -96,7 +100,7 @@ def get_studio_config(
     )
     if not studio_token:
         logger.debug(
-            f"{DVC_STUDIO_TOKEN} not found. Skipping `post_studio_live_metrics`"
+            f"{DVC_STUDIO_TOKEN} not found. Skipping `post_studio_live_metrics`",
         )
         return {}
     config["token"] = studio_token
@@ -109,14 +113,14 @@ def get_studio_config(
     )
     if studio_repo_url is None:
         logger.debug(
-            f"{DVC_STUDIO_REPO_URL} not found. Trying to automatically find it."
+            f"{DVC_STUDIO_REPO_URL} not found. Trying to automatically find it.",
         )
         studio_repo_url = get_studio_repo_url()
     if studio_repo_url:
         config["repo_url"] = studio_repo_url
     else:
         logger.debug(
-            f"{DVC_STUDIO_REPO_URL} not found. Skipping `post_studio_live_metrics`"
+            f"{DVC_STUDIO_REPO_URL} not found. Skipping `post_studio_live_metrics`",
         )
         return {}
 

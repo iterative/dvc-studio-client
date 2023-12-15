@@ -25,7 +25,8 @@ def get_studio_token_and_repo_url(studio_token=None, studio_repo_url=None):
     studio_token = studio_token or getenv(DVC_STUDIO_TOKEN) or getenv(STUDIO_TOKEN)
     """Get studio token and repo_url. Kept for backwards compatibility."""
     config = get_studio_config(
-        studio_token=studio_token, studio_repo_url=studio_repo_url
+        studio_token=studio_token,
+        studio_repo_url=studio_repo_url,
     )
     return config.get("token"), config.get("repo_url")
 
@@ -47,7 +48,7 @@ def _single_post(url, body, token):
 
     message = response.content.decode()
     logger.debug(
-        f"post_to_studio: {response.status_code=}" f", {message=}" if message else ""
+        f"post_to_studio: {response.status_code=}" f", {message=}" if message else "",
     )
 
     if response.status_code != 200:
@@ -74,7 +75,7 @@ def _post_in_chunks(url, body, token):
         if n >= MAX_NUMBER_OF_PLOTS:
             logger.warning(
                 f"Number of plots exceeds Studio limit ({MAX_NUMBER_OF_PLOTS}). "
-                "Some plots will not be sent."
+                "Some plots will not be sent.",
             )
             break
 
@@ -86,7 +87,7 @@ def _post_in_chunks(url, body, token):
         if size > MAX_PLOT_SIZE:
             logger.warning(
                 f"Size of plot exceeds Studio limit ({MAX_PLOT_SIZE}). "
-                f"{plot_name} will not be sent."
+                f"{plot_name} will not be sent.",
             )
             continue
 
@@ -94,19 +95,18 @@ def _post_in_chunks(url, body, token):
         if total_size > MAX_REQUEST_SIZE:
             logger.warning(
                 f"Total size of plots exceeds Studio limit ({MAX_REQUEST_SIZE}). "
-                "Some plots will not be sent."
+                "Some plots will not be sent.",
             )
             break
         body["plots"][plot_name] = plot_data
 
-    if body["plots"]:
-        if not _single_post(url, body, token):
-            return False
+    if body["plots"] and not _single_post(url, body, token):
+        return False
 
     return True
 
 
-def post_live_metrics(  # noqa: C901
+def post_live_metrics(  # noqa: C901,PLR0912,PLR0913
     event_type: Literal["start", "data", "done"],
     baseline_sha: str,
     name: str,
@@ -131,6 +131,7 @@ def post_live_metrics(  # noqa: C901
     infer it from `git ls-remote --get-url`.
 
     Args:
+    ----
         event_type (Literal["start", "data", "done"]): Type of the event.
         baseline_sha (str): SHA of the commit from which the experiment starts.
         name (str): Name of the experiment.
@@ -198,7 +199,9 @@ def post_live_metrics(  # noqa: C901
         studio_repo_url (Optional[str]): URL of the Git repository that has been
             imported into Studio UI.
         studio_url (Optional[str]): Base URL of Studio UI (if self-hosted).
+
     Returns:
+    -------
         Optional[bool]:
             `True` - if received status code 200 from Studio.
             `False` - if received other status code or RequestException raised.
@@ -247,7 +250,7 @@ def post_live_metrics(  # noqa: C901
         if experiment_rev:
             body["experiment_rev"] = experiment_rev
 
-    elif event_type != "start":
+    else:
         logger.warning(f"Invalid `event_type`: {event_type}")
         return None
 

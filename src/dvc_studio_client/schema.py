@@ -1,7 +1,7 @@
 from voluptuous import All, Any, Exclusive, Lower, Match, Required, Schema
 
 
-def Choices(*choices):
+def choices(*choices):
     """Checks that value belongs to the specified set of values"""
     return Any(*choices, msg=f"expected one of {', '.join(choices)}")
 
@@ -13,9 +13,9 @@ ERROR_SCHEMA = {Required("cls"): str, Required("text"): str}
 
 BASE_SCHEMA = Schema(
     {
-        Required("type"): Choices("start", "done", "data"),  # No "interrupt" for now
+        Required("type"): choices("start", "done", "data"),  # No "interrupt" for now
         Required(
-            "repo_url"
+            "repo_url",
         ): str,  # TODO: use some url validator, voluptuous.Url is too strict
         Required("baseline_sha"): Sha,
         "name": str,
@@ -26,13 +26,13 @@ BASE_SCHEMA = Schema(
         "metrics": {str: {"data": dict, "error": ERROR_SCHEMA}},
         "machine": dict,
         # Required("timestamp"): iso_datetime,  # TODO: decide if we need this
-    }
+    },
 )
 SCHEMAS_BY_TYPE = {
     "start": BASE_SCHEMA.extend(
         {
             "message": str,
-        }
+        },
     ),
     "data": BASE_SCHEMA.extend(
         {
@@ -43,13 +43,13 @@ SCHEMAS_BY_TYPE = {
                     "props": dict,
                     "error": ERROR_SCHEMA,
                     Exclusive("image", "data"): str,
-                }
+                },
             },
-        }
+        },
     ),
     "done": BASE_SCHEMA.extend(
         {
             "experiment_rev": Sha,
-        }
+        },
     ),
 }

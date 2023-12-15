@@ -1,11 +1,10 @@
 import pytest
-
 from dvc_studio_client.env import DVC_STUDIO_TOKEN, DVC_STUDIO_URL
 from dvc_studio_client.model_registry import get_download_uris
 
 
 @pytest.fixture(autouse=True)
-def setenv(monkeypatch):
+def _setenv(monkeypatch):
     monkeypatch.setenv(DVC_STUDIO_URL, "https://0.0.0.0")
     monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
 
@@ -36,11 +35,15 @@ def test_get_download_uris(mocker, monkeypatch):
 
 def test_get_download_uris_args(mocker):
     mocked_get = mocker.patch(
-        "requests.get", return_value=mocker.MagicMock(status_code=200)
+        "requests.get",
+        return_value=mocker.MagicMock(status_code=200),
     )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         get_download_uris(
-            "https://my/repo.git", "model", version="version", stage="stage"
+            "https://my/repo.git",
+            "model",
+            version="version",
+            stage="stage",
         )
 
     mocked_get.reset_mock()

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 
 [project]
-name = "DVC Studio Client"
+name = "dvc-studio-client"
 description = "Small library to post data from DVC/DVCLive to Iterative Studio "
 readme = "README.rst"
 license = {text = "Apache-2.0"}
@@ -23,8 +23,8 @@ dynamic = ["version"]
 dependencies = []
 
 [project.urls]
-Issues = "https://github.com/iterative/DVC Studio Client/issues"
-Source = "https://github.com/iterative/DVC Studio Client"
+Issues = "https://github.com/iterative/dvc-studio-client/issues"
+Source = "https://github.com/iterative/dvc-studio-client"
 
 [project.optional-dependencies]
 docs = [
@@ -42,8 +42,8 @@ tests = [
     "mypy==0.971",
 ]
 dev = [
-    "DVC Studio Client[tests]",
-    "DVC Studio Client[docs]",
+    "dvc-studio-client[tests]",
+    "dvc-studio-client[docs]",
 ]
 
 [tool.setuptools.packages.find]
@@ -100,7 +100,13 @@ ignore = [
     "D203", # one blank line before class
     "D213", # multi-line-summary-second-line
 ]
-select = ["ALL"]
+select = [
+    "F", "E", "W", "C90", "I", "N", "UP", "YTT", "ASYNC", "S", "BLE", "B", "A", "C4", "T10",
+    "EXE", "ISC", "ICN", "G", "INP", "PIE", "T20", "PYI", "PT", "Q", "RSE", "RET",
+    "SLOT", "SIM", "TID", "TCH", "ARG", "PGH", "PLC", "PLE", "PLR", "PLW", "TRY",
+    "FLY", "PERF101", "RUF",
+]
+
 show-source = true
 show-fixes = true
 

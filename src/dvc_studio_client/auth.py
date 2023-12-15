@@ -26,12 +26,17 @@ class InvalidScopesError(StudioAuthError):
     pass
 
 
-class AuthorizationExpired(StudioAuthError):
+class AuthorizationExpiredError(StudioAuthError):
     pass
 
 
 def get_access_token(
-    *, hostname, token_name=None, scopes="", use_device_code=False, client_name="client"
+    *,
+    hostname,
+    token_name=None,
+    scopes="",
+    use_device_code=False,
+    client_name="client",
 ):
     """Initiate Authorization
 
@@ -39,7 +44,8 @@ def get_access_token(
     It generates a user code and a verification URI that the user needs to
     access in order to authorize the application.
 
-    Parameters:
+    Parameters
+    ----------
         token_name (str): The name of the client application.
         hostname (str): The base URL of the application.
         scopes (str, optional): A comma-separated string of scopes that
@@ -48,12 +54,12 @@ def get_access_token(
         flow for authorization. Default is False.
         client_name (str, optional): Client name
 
-    Returns:
+    Returns
+    -------
         tuple: A tuple containing the token name and the access token.
         The token name is a string representing the token's name,
         while the access token is a string representing the authorized access token.
     """
-
     import webbrowser
 
     response = start_device_login(
@@ -74,16 +80,16 @@ def get_access_token(
         opened = webbrowser.open(url)
 
     if opened:
-        print(
+        print(  # noqa: T201
             f"A web browser has been opened at \n{verification_uri}.\n"
             f"Please continue the login in the web browser.\n"
             f"If no web browser is available or if the web browser fails to open,\n"
-            f"use device code flow with `dvc studio login --use-device-code`."
+            f"use device code flow with `dvc studio login --use-device-code`.",
         )
 
     else:
-        print(f"Please open the following url in your browser.\n{verification_uri}")
-        print(f"And enter the user code below {user_code} to authorize.")
+        print(f"Please open the following url in your browser.\n{verification_uri}")  # noqa: T201
+        print(f"And enter the user code below {user_code} to authorize.")  # noqa: T201
 
     access_token = check_token_authorization(uri=token_uri, device_code=device_code)
 
@@ -93,15 +99,14 @@ def get_access_token(
 def start_device_login(
     *,
     client_name: str,
-    base_url: str = None,
+    base_url: Optional[str] = None,
     token_name: Optional[str] = None,
     scopes: Optional[List[str]] = None,
 ) -> DeviceLoginResponse:
-    """
+    """This method starts the device login process for Studio.
 
-    This method starts the device login process for Studio.
-
-    Parameters:
+    Parameters
+    ----------
     - client_name (required): The name of the client application.
 
     Optional Parameters:
@@ -110,10 +115,12 @@ def start_device_login(
     - token_name: The name of the token. If not provided, it defaults to None.
     - scopes: A list of scopes to request. If not provided, it defaults to None.
 
-    Returns:
+    Returns
+    -------
     - DeviceLoginResponse: A response object containing the device login information.
 
-    Raises:
+    Raises
+    ------
     - ValueError: If any of the provided scopes are not valid.
     - RequestException: If the request fails with any 400 response or any other reason.
 
@@ -123,10 +130,10 @@ def start_device_login(
         f" ({base_url})" if base_url else "",
     )
     if invalid_scopes := list(
-        filter(lambda s: s.upper() not in AVAILABLE_SCOPES, scopes)
+        filter(lambda s: s.upper() not in AVAILABLE_SCOPES, scopes),  # type: ignore[arg-type,attr-defined]
     ):
-        raise InvalidScopesError(
-            f"Following scopes are not valid: {', '.join(invalid_scopes)}"
+        raise InvalidScopesError(  # noqa: TRY003
+            f"Following scopes are not valid: {', '.join(invalid_scopes)}",  # type: ignore[arg-type]
         )
 
     body = {"client_name": client_name}
@@ -135,7 +142,7 @@ def start_device_login(
         body["token_name"] = token_name
 
     if scopes:
-        body["scopes"] = scopes
+        body["scopes"] = scopes  # type: ignore[assignment]
 
     logger.debug(f"JSON body `{body=}`")
 
@@ -156,18 +163,20 @@ def start_device_login(
 
 
 def check_token_authorization(*, uri: str, device_code: str) -> Optional[str]:
-    """
-    Checks the authorization status of a token based on a device code and
+    """Checks the authorization status of a token based on a device code and
     returns access token upon successful authorization.
 
-    Parameters:
+    Parameters
+    ----------
     - uri (str): The token uri to send the request to.
     - device_code (str): The device code to check authorization for.
 
-    Returns:
+    Returns
+    -------
     - str | None: The access token if authorized, otherwise None.
 
-    Raises:
+    Raises
+    ------
     - requests.HTTPError: If the status code of the response is not 200.
 
     Example Usage:
@@ -204,8 +213,8 @@ def check_token_authorization(*, uri: str, device_code: str) -> Optional[str]:
                 time.sleep(5)
                 continue
             if detail == "authorization_expired":
-                raise AuthorizationExpired(
-                    "failed to authenticate: This 'device_code' has expired."
+                raise AuthorizationExpiredError(  # noqa: TRY003
+                    "failed to authenticate: This 'device_code' has expired.",
                 )
 
         r.raise_for_status()

@@ -10,7 +10,7 @@ formatter = logging.Formatter("%(levelname)s:%(name)s:%(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(
-    getenv(DVC_STUDIO_CLIENT_LOGLEVEL, getenv(DVCLIVE_LOGLEVEL, "WARNING")).upper()
+    getenv(DVC_STUDIO_CLIENT_LOGLEVEL, getenv(DVCLIVE_LOGLEVEL, "WARNING")).upper(),
 )
 
 DEFAULT_STUDIO_URL = "https://studio.iterative.ai"

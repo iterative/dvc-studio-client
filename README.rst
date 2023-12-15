@@ -1,4 +1,4 @@
-DVC Studio Client
+dvc-studio-client
 =================
 
 Client to interact with `DVC Studio`_.
@@ -47,7 +47,7 @@ Features
 Installation
 ------------
 
-You can install *DVC Studio Client* via pip_ from PyPI_:
+You can install *dvc-studio-client* via pip_ from PyPI_:
 
 .. code:: console
 
@@ -57,7 +57,7 @@ License
 -------
 
 Distributed under the terms of the `Apache 2.0 license`_,
-*DVC Studio Client* is free and open source software.
+*dvc-studio-client* is free and open source software.
 
 
 Issues
@@ -69,7 +69,7 @@ please `file an issue`_ along with a detailed description.
 
 .. _Apache 2.0 license: https://opensource.org/licenses/Apache-2.0
 .. _PyPI: https://pypi.org/
-.. _file an issue: https://github.com/iterative/DVC Studio Client/issues
+.. _file an issue: https://github.com/iterative/dvc-studio-client/issues
 .. _pip: https://pip.pypa.io/
 .. github-only
 .. _Contributor Guide: CONTRIBUTING.rst
