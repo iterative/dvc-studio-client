@@ -21,6 +21,7 @@ def get_download_uris(
     """Return download URIs for the specified model.
 
     Args:
+    ----
         repo: Git repo URL.
         name: Model name.
         version: Model version.
@@ -29,14 +30,15 @@ def get_download_uris(
     Additional keyword arguments will be passed to get_studio_config().
 
     Raises:
+    ------
         ValueError: Invalid arguments were passed or the API call failed.
     """
     config = get_studio_config(**kwargs)
     if not config:
-        raise ValueError("No studio config")
+        raise ValueError("No studio config")  # noqa: TRY003
     params = {"repo": repo, "name": name}
     if version and stage:
-        raise ValueError("Version and stage are mutually exclusive")
+        raise ValueError("Version and stage are mutually exclusive")  # noqa: TRY003
     if version:
         params["version"] = version
     if stage:
@@ -51,7 +53,7 @@ def get_download_uris(
             timeout=(30, 5),
         )
     except RequestException as e:
-        raise ValueError("Failed to reach studio API") from e
+        raise ValueError("Failed to reach studio API") from e  # noqa: TRY003
 
     if response.status_code != 200:
         message = response.content.decode()
@@ -60,5 +62,5 @@ def get_download_uris(
             response.status_code,
             message,
         )
-        raise ValueError(f"Failed to get model download URIs from studio: {message}")
+        raise ValueError(f"Failed to get model download URIs from studio: {message}")  # noqa: TRY003
     return response.json()

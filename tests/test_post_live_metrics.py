@@ -1,8 +1,6 @@
 import logging
 
 import pytest
-from requests import RequestException
-
 from dvc_studio_client import DEFAULT_STUDIO_URL
 from dvc_studio_client.env import (
     DVC_STUDIO_REPO_URL,
@@ -16,6 +14,7 @@ from dvc_studio_client.post_live_metrics import (
     get_studio_token_and_repo_url,
     post_live_metrics,
 )
+from requests import RequestException
 
 
 def test_post_live_metrics_skip_on_missing_token(caplog):
@@ -202,7 +201,7 @@ def test_post_live_metrics_data(mocker, monkeypatch):
         plots={"dvclive/plots/metrics/foo.tsv": {"data": [{"step": 0, "foo": 1.0}]}},
     )
 
-    assert mocked_post.has_calls(
+    assert mocked_post.has_calls(  # noqa: PGH005
         [
             mocker.call(
                 "https://studio.iterative.ai/api/live",
@@ -214,7 +213,7 @@ def test_post_live_metrics_data(mocker, monkeypatch):
                     "client": "fooclient",
                     "step": 0,
                     "metrics": {
-                        "dvclive/metrics.json": {"data": {"step": 0, "foo": 1}}
+                        "dvclive/metrics.json": {"data": {"step": 0, "foo": 1}},
                     },
                 },
                 headers={
@@ -234,8 +233,8 @@ def test_post_live_metrics_data(mocker, monkeypatch):
                     "step": 0,
                     "plots": {
                         "dvclive/plots/metrics/foo.tsv": {
-                            "data": [{"step": 0, "foo": 1.0}]
-                        }
+                            "data": [{"step": 0, "foo": 1.0}],
+                        },
                     },
                 },
                 headers={
@@ -244,7 +243,7 @@ def test_post_live_metrics_data(mocker, monkeypatch):
                 },
                 timeout=(30, 5),
             ),
-        ]
+        ],
     )
 
 
@@ -279,7 +278,11 @@ def test_post_live_metrics_done(mocker, monkeypatch):
     )
 
     assert post_live_metrics(
-        "done", "f" * 40, "fooname", "fooclient", experiment_rev="h" * 40
+        "done",
+        "f" * 40,
+        "fooname",
+        "fooclient",
+        experiment_rev="h" * 40,
     )
     mocked_post.assert_called_with(
         "https://studio.iterative.ai/api/live",
@@ -500,7 +503,7 @@ def test_post_in_chunks(mocker, monkeypatch):
         },
     )
     assert mocked_post.call_count == 2
-    assert mocked_post.has_calls(
+    assert mocked_post.has_calls(  # noqa: PGH005
         [
             mocker.call(
                 "https://studio.iterative.ai/api/live",
@@ -512,7 +515,7 @@ def test_post_in_chunks(mocker, monkeypatch):
                     "client": "fooclient",
                     "step": 0,
                     "metrics": {
-                        "dvclive/metrics.json": {"data": {"step": 0, "foo": 1}}
+                        "dvclive/metrics.json": {"data": {"step": 0, "foo": 1}},
                     },
                 },
                 headers={
@@ -538,7 +541,7 @@ def test_post_in_chunks(mocker, monkeypatch):
                 },
                 timeout=(30, 5),
             ),
-        ]
+        ],
     )
 
 
@@ -575,7 +578,7 @@ def test_post_in_chunks_max_number_of_plots(mocker, monkeypatch):
     plots = {}
     for i in range(MAX_NUMBER_OF_PLOTS + 2):
         plots[f"dvclive/plots/images/{i}.png"] = {
-            "data": [{"step": i, "foo": float(i)}]
+            "data": [{"step": i, "foo": float(i)}],
         }
     mocked_post = mocker.patch("requests.post", return_value=mocked_response)
     assert post_live_metrics(

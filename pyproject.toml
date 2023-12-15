@@ -4,28 +4,55 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
 
-[tool.black]
-line-length = 88
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-)/
-'''
+[project]
+name = "dvc-studio-client"
+description = "Small library to post data from DVC/DVCLive to Iterative Studio "
+readme = "README.rst"
+license = {text = "Apache-2.0"}
+authors = [{ name = "Iterative", email = "support@dvc.org" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Development Status :: 1 - Planning",
+]
+requires-python = ">=3.8"
+dynamic = ["version"]
+dependencies = [
+    "dulwich",
+    "requests",
+    "voluptuous",
+]
 
-[tool.isort]
-profile = "black"
-known_first_party = ["dvc-studio-client"]
-line_length = 88
+[project.urls]
+Issues = "https://github.com/iterative/dvc-studio-client/issues"
+Source = "https://github.com/iterative/dvc-studio-client"
+
+[project.optional-dependencies]
+docs = [
+    "mkdocs==1.5.2",
+    "mkdocs-gen-files==0.5.0",
+    "mkdocs-material==9.3.1",
+    "mkdocs-section-index==0.3.6",
+    "mkdocstrings-python==1.6.3",
+]
+tests = [
+    "pytest==7.2.0",
+    "pytest-sugar==0.9.5",
+    "pytest-cov==3.0.0",
+    "pytest-mock==3.8.2",
+    "mypy==0.971",
+]
+dev = [
+    "dvc-studio-client[tests]",
+    "dvc-studio-client[docs]",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = false
 
 [tool.pytest.ini_options]
 addopts = "-ra"
@@ -49,15 +76,51 @@ exclude_lines = [
     "@overload",
 ]
 
+[tool.mypy]
+# Error output
+show_column_numbers = true
+show_error_codes = true
+show_error_context = true
+show_traceback = true
+pretty = true
+check_untyped_defs = false
+# Warnings
+warn_no_return = true
+warn_redundant_casts = true
+warn_unreachable = true
+files = ["src", "tests"]
+
 [tool.codespell]
 ignore-words-list = " "
 
-[tool.pylint.format]
-max-line-length = 88
+[tool.ruff]
+ignore = [
+    "S101", # assert
+    "PLR2004", # magic-value-comparison
+    "PLW2901", # redefined-loop-name
+    "ISC001", # single-line-implicit-string-concatenation
+    "SIM105", # suppressible-exception
+    "SIM108", # if-else-block-instead-of-if-exp
+    "D203", # one blank line before class
+    "D213", # multi-line-summary-second-line
+]
+select = [
+    "F", "E", "W", "C90", "I", "N", "UP", "YTT", "ASYNC", "S", "BLE", "B", "A", "C4", "T10",
+    "EXE", "ISC", "ICN", "G", "INP", "PIE", "T20", "PYI", "PT", "Q", "RSE", "RET",
+    "SLOT", "SIM", "TID", "TCH", "ARG", "PGH", "PLC", "PLE", "PLR", "PLW", "TRY",
+    "FLY", "PERF101", "RUF",
+]
 
-[tool.pylint.message_control]
-enable = ["c-extension-no-member", "no-else-return"]
+show-source = true
+show-fixes = true
 
-[tool.bandit]
-exclude_dirs = ["tests"]
-skips = ["B101"]
+[tool.ruff.per-file-ignores]
+"noxfile.py" = ["D", "PTH"]
+"tests/**" = ["S", "ARG001", "ARG002", "ANN"]
+"docs/**" = ["INP"]
+
+[tool.ruff.lint.flake8-type-checking]
+strict = true
+
+[tool.ruff.lint.isort]
+known-first-party = ["{{ cookiecutter.package_name }}"]

@@ -1,3 +1,3 @@
-# Welcome to DVC Studio Client
+# Welcome to dvc-studio-client
 
 - [API Reference](./reference/dvc_studio_client/)

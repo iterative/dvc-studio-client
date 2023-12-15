@@ -13,9 +13,9 @@ Here is a list of important resources for contributors:
 - `Code of Conduct`_
 
 .. _Apache 2.0 license: https://opensource.org/licenses/Apache-2.0
-.. _Source Code: https://github.com/iterative/DVC Studio Client
-.. _Documentation: https://docs.iterative.ai/DVC Studio Client
-.. _Issue Tracker: https://github.com/iterative/DVC Studio Client/issues
+.. _Source Code: https://github.com/iterative/dvc-studio-client
+.. _Documentation: https://docs.iterative.ai/dvc-studio-client
+.. _Issue Tracker: https://github.com/iterative/dvc-studio-client/issues
 
 How to report a bug
 -------------------
@@ -106,6 +106,6 @@ To run linting and code formatting checks, you can invoke a `lint` session in no
 It is recommended to open an issue before starting work on anything.
 This will allow a chance to talk it over with the owners and validate your approach.
 
-.. _pull request: https://github.com/iterative/DVC Studio Client/pulls
+.. _pull request: https://github.com/iterative/dvc-studio-client/pulls
 .. github-only
 .. _Code of Conduct: CODE_OF_CONDUCT.rst

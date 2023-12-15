@@ -2,7 +2,6 @@ import os
 
 import pytest
 from dulwich.porcelain import clone, init
-
 from dvc_studio_client import DEFAULT_STUDIO_URL
 from dvc_studio_client.config import _get_remote_url, get_studio_config
 from dvc_studio_client.env import (
@@ -31,7 +30,7 @@ def test_get_remote_url_no_remote(monkeypatch, tmp_path_factory):
 
 
 @pytest.mark.parametrize(
-    "token,repo_url",
+    ("token", "repo_url"),
     [(DVC_STUDIO_TOKEN, DVC_STUDIO_REPO_URL), (STUDIO_TOKEN, STUDIO_REPO_URL)],
 )
 def test_studio_config_envvar(monkeypatch, token, repo_url):
@@ -111,7 +110,7 @@ def test_studio_config_kwarg_override(monkeypatch):
 
 @pytest.mark.parametrize(
     "val",
-    ("1", "y", "yes", "true", True, 1),
+    ("1", "y", "yes", "true", True, 1),  # noqa: PT007
 )
 def test_studio_config_offline(monkeypatch, val):
     monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
