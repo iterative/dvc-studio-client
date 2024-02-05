@@ -43,7 +43,7 @@ tests = [
     "pytest-sugar==0.9.5",
     "pytest-cov==3.0.0",
     "pytest-mock==3.8.2",
-    "mypy==0.971",
+    "mypy==1.8.0",
 ]
 dev = [
     "dvc-studio-client[tests]",
