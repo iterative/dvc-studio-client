@@ -1,3 +1,4 @@
+import sys
 from typing import List, Optional, TypedDict
 from urllib.parse import urljoin
 
@@ -30,13 +31,15 @@ class AuthorizationExpiredError(StudioAuthError):
     pass
 
 
-def get_access_token(
+def get_access_token(  # noqa: PLR0913
     *,
-    hostname,
-    token_name=None,
-    scopes="",
-    use_device_code=False,
-    client_name="client",
+    hostname: str,
+    token_name: Optional[str] = None,
+    scopes: str = "",
+    client_name: str = "client",
+    open_browser: bool = True,
+    post_login_message: Optional[str] = None,
+    use_device_code: bool = False,
 ):
     """Initiate Authentication
 
@@ -49,9 +52,8 @@ def get_access_token(
         token_name (str): The name of the client application.
         hostname (str): The base URL of the application.
         scopes (str, optional): A comma-separated string of scopes that
-        the application requires. Default is empty.
-        use_device_code (bool, optional): Whether to use the device code
-        flow for authentication. Default is False.
+            the application requires. Default is empty.
+        open_browser (bool): Whether or not to open the browser to authenticate
         client_name (str, optional): Client name
 
     Returns
@@ -61,6 +63,11 @@ def get_access_token(
         while the access token is a string representing the authorized access token.
     """
     import webbrowser
+
+    post_login_message = post_login_message or (
+        "Once you've logged in, return here "
+        "and you'll be ready to start the experiments."
+    )
 
     response = start_device_login(
         client_name=client_name,
@@ -73,26 +80,26 @@ def get_access_token(
     device_code = response["device_code"]
     token_uri = response["token_uri"]
     token_name = response["token_name"]
+    url = f"{verification_uri}?code={user_code}"
 
-    opened = False
-    if not use_device_code:
-        url = f"{verification_uri}?code={user_code}"
+    if use_device_code:
+        open_browser = False  # backward compatibility
+
+    if open_browser:
+        print("Opening link for login at", url)  # noqa: T201
+        print(f"\n{post_login_message}")  # noqa: T201
         opened = webbrowser.open(url)
-
-    if opened:
-        print(  # noqa: T201
-            f"A web browser has been opened at \n{verification_uri}.\n"
-            f"Please continue the login in the web browser.\n"
-            f"If no web browser is available or if the web browser fails to open,\n"
-            f"use device code flow with `dvc studio login --use-device-code`.",
-        )
-
+        if not opened:
+            print(  # noqa: T201
+                "\nFailed to open a web browser. "
+                "Open the above url to continue in your web browser.",
+                file=sys.stderr,
+            )
     else:
-        print(f"Please open the following url in your browser.\n{verification_uri}")  # noqa: T201
-        print(f"And enter the user code below {user_code} to authorize.")  # noqa: T201
+        print("Open this url to continue in your web browser:", url)  # noqa: T201
+        print(f"\n{post_login_message}")  # noqa: T201
 
     access_token = check_token_authentication(uri=token_uri, device_code=device_code)
-
     return token_name, access_token
 
 

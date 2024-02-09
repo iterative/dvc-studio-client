@@ -117,7 +117,13 @@ def test_auth_success(mocker, mock_post, capfd):
             allow_redirects=False,
         ),
     ]
-    assert "Please continue the login in the web browser" in capfd.readouterr().out
+    out, err = capfd.readouterr()
+    assert out == (
+        f"Opening link for login at {MOCK_RESPONSE['verification_uri']}?code=MOCKCODE\n"
+        "\nOnce you've logged in, return here and you'll be ready to start the "
+        "experiments.\n"
+    )
+    assert not err
 
 
 def test_webbrowser_open_fails(mocker, mock_post, capfd):
@@ -139,10 +145,50 @@ def test_webbrowser_open_fails(mocker, mock_post, capfd):
         scopes="experiments",
         token_name="random-name",
     ) == ("random-name", "isat_access_token")
-    assert "Please open the following url in your browser" in capfd.readouterr().out
+    out, err = capfd.readouterr()
+    assert out == (
+        f"Opening link for login at {MOCK_RESPONSE['verification_uri']}?code=MOCKCODE\n"
+        "\nOnce you've logged in, return here and you'll be ready to start the "
+        "experiments.\n"
+    )
+    assert (
+        err == "\nFailed to open a web browser. "
+        "Open the above url to continue in your web browser.\n"
+    )
 
 
-def test_start_device_login(mocker, mock_post):
+@pytest.mark.parametrize("kwargs", [{"use_device_code": True}, {"open_browser": False}])
+def test_start_no_open(mocker, mock_post, capfd, kwargs):
+    mock_open = mocker.patch("webbrowser.open")
+
+    mocker.patch("time.sleep")
+    mock_post("requests.post", [(200, MOCK_RESPONSE)])
+    mock_post(
+        "requests.Session.post",
+        [
+            (400, {"detail": "authorization_pending"}),
+            (200, {"access_token": "isat_access_token"}),
+        ],
+    )
+
+    assert get_access_token(
+        hostname="https://example.com",
+        scopes="experiments",
+        token_name="random-name",
+        **kwargs,
+    ) == ("random-name", "isat_access_token")
+    mock_open.assert_not_called()
+    out, err = capfd.readouterr()
+    assert out == (
+        "Open this url to continue in your web browser: "
+        f"{MOCK_RESPONSE['verification_uri']}?code=MOCKCODE\n"
+        "\nOnce you've logged in, return here and you'll be ready to start the "
+        "experiments.\n"
+    )
+    assert not err
+
+
+def test_start_device_login(capfd, mocker, mock_post):
     example_response = {
         "device_code": "random-device-code",
         "user_code": "MOCKCODE",
