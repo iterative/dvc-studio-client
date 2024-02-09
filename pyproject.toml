@@ -48,6 +48,7 @@ tests = [
 dev = [
     "dvc-studio-client[tests]",
     "dvc-studio-client[docs]",
+    "types-requests",
 ]
 
 [tool.setuptools.packages.find]
