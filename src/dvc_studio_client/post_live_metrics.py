@@ -123,6 +123,8 @@ def post_live_metrics(  # noqa: C901,PLR0912,PLR0913
     studio_token: Optional[str] = None,
     studio_repo_url: Optional[str] = None,
     studio_url: Optional[str] = None,
+    dvc_experiment_parent_data: Optional[Dict[str, Any]] = None,
+    subdir: Optional[str] = None,
 ) -> Optional[bool]:
     """Post `event_type` to Studio's `api/live`.
 
@@ -239,6 +241,10 @@ def post_live_metrics(  # noqa: C901,PLR0912,PLR0913
         if message:
             # Cutting the message to match the commit title length limit.
             body["message"] = message[:72]
+        if subdir:
+            body["subdir"] = subdir
+        if dvc_experiment_parent_data:
+            body["dvc_experiment_parent_data"] = dvc_experiment_parent_data
     elif event_type == "data":
         if step is None:
             logger.warning("Missing `step` in `data` event.")

@@ -38,59 +38,103 @@ def test_post_live_metrics_skip_on_schema_error(caplog, monkeypatch):
 
 
 def test_post_live_metrics_start_event(mocker, monkeypatch):
-    monkeypatch.setenv(DVC_STUDIO_URL, "https://0.0.0.0")
-    monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
-    monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
+    repo_url = "FOO_REPO_URL"
+    studio_url = "https://0.0.0.0"
+    studio_token = "FOO_TOKEN"
+    baseline_sha = "f" * 40
+    event_type = "start"
+    name = "fooname"
+    client = "fooclient"
+
+    post_url = f"{studio_url}/api/live"
+    headers = {
+        "Authorization": f"token {studio_token}",
+        "Content-type": "application/json",
+    }
+    base_event = {
+        "type": "start",
+        "repo_url": "FOO_REPO_URL",
+        "baseline_sha": baseline_sha,
+        "name": name,
+        "client": client,
+    }
+
+    monkeypatch.setenv(DVC_STUDIO_URL, studio_url)
+    monkeypatch.setenv(DVC_STUDIO_TOKEN, studio_token)
+    monkeypatch.setenv(STUDIO_REPO_URL, repo_url)
 
     mocked_response = mocker.MagicMock()
     mocked_response.status_code = 200
     mocked_post = mocker.patch("requests.post", return_value=mocked_response)
 
     assert post_live_metrics(
-        "start",
-        "f" * 40,
-        "fooname",
-        "fooclient",
+        event_type,
+        baseline_sha,
+        name,
+        client,
     )
 
     mocked_post.assert_called_with(
-        "https://0.0.0.0/api/live",
-        json={
-            "type": "start",
-            "repo_url": "FOO_REPO_URL",
-            "baseline_sha": "f" * 40,
-            "name": "fooname",
-            "client": "fooclient",
-        },
-        headers={
-            "Authorization": "token FOO_TOKEN",
-            "Content-type": "application/json",
-        },
+        post_url,
+        json=base_event,
+        headers=headers,
         timeout=(30, 5),
     )
 
-    post_live_metrics(
-        "start",
-        "f" * 40,
-        "fooname",
-        "fooclient",
+    assert post_live_metrics(
+        event_type,
+        baseline_sha,
+        name,
+        client,
         params={"params.yaml": {"foo": "bar"}},
     )
 
     mocked_post.assert_called_with(
-        "https://0.0.0.0/api/live",
+        post_url,
         json={
-            "type": "start",
-            "repo_url": "FOO_REPO_URL",
-            "baseline_sha": "f" * 40,
-            "name": "fooname",
-            "client": "fooclient",
+            **base_event,
             "params": {"params.yaml": {"foo": "bar"}},
         },
-        headers={
-            "Authorization": "token FOO_TOKEN",
-            "Content-type": "application/json",
+        headers=headers,
+        timeout=(30, 5),
+    )
+
+    dvc_experiment_parent_data = {
+        "sha": baseline_sha,
+        "message": "test message",
+        "title": "test message",
+        "author": {
+            "name": "Monrepo user",
+            "email": "overcomplicated@iLoveMonorepos.com",
         },
+        "date": "2021-09-01T12:00:00+00:00",
+        "parent_shas": [
+            "e" * 40,
+            "d" * 40,
+            "c" * 40,
+            "b" * 40,
+            "a" * 40,
+        ],
+    }
+    subdir = "subdir"
+
+    assert post_live_metrics(
+        "start",
+        baseline_sha,
+        name,
+        client,
+        dvc_experiment_parent_data=dvc_experiment_parent_data,
+        subdir=subdir,
+    )
+
+    mocked_post.assert_called_with(
+        post_url,
+        json={
+            **base_event,
+            "dvc_experiment_parent_data": dvc_experiment_parent_data,
+            "subdir": subdir,
+        },
+        headers=headers,
         timeout=(30, 5),
     )
 
