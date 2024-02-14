@@ -1,4 +1,4 @@
-from voluptuous import All, Any, Exclusive, Lower, Match, Required, Schema
+from voluptuous import All, Any, Exclusive, Lower, Match, Optional, Required, Schema
 
 
 def choices(*choices):
@@ -32,6 +32,7 @@ SCHEMAS_BY_TYPE = {
     "start": BASE_SCHEMA.extend(
         {
             "message": str,
+            Optional("subdir"): str,
         },
     ),
     "data": BASE_SCHEMA.extend(
