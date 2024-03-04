@@ -513,8 +513,7 @@ def test_post_in_chunks(mocker, monkeypatch):
     mocked_response = mocker.MagicMock()
     mocked_response.status_code = 200
 
-    mocked_image = mocker.MagicMock("foo")
-    mocked_image.__len__.return_value = 9000000
+    mocked_image = "foo" * 3000000
 
     mocked_post = mocker.patch("requests.post", return_value=mocked_response)
     mocked_post = copy_call_args(mocked_post)
