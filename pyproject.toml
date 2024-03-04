@@ -2,28 +2,26 @@
 requires = ["setuptools>=48", "setuptools_scm[toml]>=6.3.1"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools_scm]
-
 [project]
 name = "dvc-studio-client"
 description = "Small library to post data from DVC/DVCLive to Iterative Studio "
 readme = "README.rst"
 license = {text = "Apache-2.0"}
-authors = [{ name = "Iterative", email = "support@dvc.org" }]
+authors = [{name = "Iterative", email = "support@dvc.org"}]
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Development Status :: 1 - Planning",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Development Status :: 1 - Planning"
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dynamic = ["version"]
 dependencies = [
-    "dulwich",
-    "requests",
-    "voluptuous",
+  "dulwich",
+  "requests",
+  "voluptuous"
 ]
 
 [project.urls]
@@ -32,24 +30,25 @@ Source = "https://github.com/iterative/dvc-studio-client"
 
 [project.optional-dependencies]
 docs = [
-    "mkdocs==1.5.3",
-    "mkdocs-gen-files==0.5.0",
-    "mkdocs-material==9.5.12",
-    "mkdocs-section-index==0.3.8",
-    "mkdocstrings-python==1.8.0",
+  "mkdocs>=1.5.2,<2",
+  "mkdocs-gen-files>=0.5.0,<1",
+  "mkdocs-material>=9.3.1,<10",
+  "mkdocs-section-index>=0.3.6,<1",
+  "mkdocstrings-python>=1.6.3,<2"
 ]
 tests = [
-    "pytest==8.1.0",
-    "pytest-sugar==1.0.0",
-    "pytest-cov==4.1.0",
-    "pytest-mock==3.12.0",
-    "mypy==1.8.0",
+  "pytest>=7,<9",
+  "pytest-cov>=4.1.0",
+  "pytest-sugar",
+  "pytest-mock"
 ]
 dev = [
-    "dvc-studio-client[tests]",
-    "dvc-studio-client[docs]",
-    "types-requests",
+  "dvc-studio-client[tests,docs]",
+  "types-requests",
+  "mypy==1.8.0"
 ]
+
+[tool.setuptools_scm]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -68,13 +67,13 @@ source = ["src", "*/site-packages"]
 [tool.coverage.report]
 show_missing = true
 exclude_lines = [
-    "pragma: no cover",
-    "if __name__ == .__main__.:",
-    "if typing.TYPE_CHECKING:",
-    "if TYPE_CHECKING:",
-    "raise NotImplementedError",
-    "raise AssertionError",
-    "@overload",
+  "pragma: no cover",
+  "if __name__ == .__main__.:",
+  "if typing.TYPE_CHECKING:",
+  "if TYPE_CHECKING:",
+  "raise NotImplementedError",
+  "raise AssertionError",
+  "@overload"
 ]
 
 [tool.mypy]
@@ -94,28 +93,62 @@ files = ["src", "tests"]
 [tool.codespell]
 ignore-words-list = " "
 
-[tool.ruff]
+[tool.ruff.lint]
 ignore = [
-    "S101", # assert
-    "PLR2004", # magic-value-comparison
-    "PLW2901", # redefined-loop-name
-    "ISC001", # single-line-implicit-string-concatenation
-    "SIM105", # suppressible-exception
-    "SIM108", # if-else-block-instead-of-if-exp
-    "D203", # one blank line before class
-    "D213", # multi-line-summary-second-line
+  "S101",  # assert
+  "PLR2004",  # magic-value-comparison
+  "PLW2901",  # redefined-loop-name
+  "ISC001",  # single-line-implicit-string-concatenation
+  "SIM105",  # suppressible-exception
+  "SIM108",  # if-else-block-instead-of-if-exp
+  "D203",  # one blank line before class
+  "D213"  # multi-line-summary-second-line
 ]
 select = [
-    "F", "E", "W", "C90", "I", "N", "UP", "YTT", "ASYNC", "S", "BLE", "B", "A", "C4", "T10",
-    "EXE", "ISC", "ICN", "G", "INP", "PIE", "T20", "PYI", "PT", "Q", "RSE", "RET",
-    "SLOT", "SIM", "TID", "TCH", "ARG", "PGH", "PLC", "PLE", "PLR", "PLW", "TRY",
-    "FLY", "PERF101", "RUF",
+  "F",
+  "E",
+  "W",
+  "C90",
+  "I",
+  "N",
+  "UP",
+  "YTT",
+  "ASYNC",
+  "S",
+  "BLE",
+  "B",
+  "A",
+  "C4",
+  "T10",
+  "EXE",
+  "ISC",
+  "ICN",
+  "G",
+  "INP",
+  "PIE",
+  "T20",
+  "PYI",
+  "PT",
+  "Q",
+  "RSE",
+  "RET",
+  "SLOT",
+  "SIM",
+  "TID",
+  "TCH",
+  "ARG",
+  "PGH",
+  "PLC",
+  "PLE",
+  "PLR",
+  "PLW",
+  "TRY",
+  "FLY",
+  "PERF101",
+  "RUF"
 ]
 
-show-source = true
-show-fixes = true
-
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "noxfile.py" = ["D", "PTH"]
 "tests/**" = ["S", "ARG001", "ARG002", "ANN"]
 "docs/**" = ["INP"]

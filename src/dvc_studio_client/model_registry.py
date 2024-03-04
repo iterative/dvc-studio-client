@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Optional
 from urllib.parse import urljoin
 
 import requests
@@ -17,7 +17,7 @@ def get_download_uris(
     version: Optional[str] = None,
     stage: Optional[str] = None,
     **kwargs,
-) -> Dict[str, str]:
+) -> dict[str, str]:
     """Return download URIs for the specified model.
 
     Args:

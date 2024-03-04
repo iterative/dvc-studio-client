@@ -1,4 +1,6 @@
 import logging
+from copy import deepcopy
+from unittest.mock import DEFAULT, MagicMock
 
 import pytest
 from dvc_studio_client import DEFAULT_STUDIO_URL
@@ -163,6 +165,19 @@ def test_post_live_metrics_data_skip_if_no_step(caplog, monkeypatch):
     assert caplog.records[0].message == ("Missing `step` in `data` event.")
 
 
+def copy_call_args(mock):
+    new_mock = MagicMock()
+
+    def side_effect(*args, **kwargs):
+        args = deepcopy(args)
+        kwargs = deepcopy(kwargs)
+        new_mock(*args, **kwargs)
+        return DEFAULT
+
+    mock.side_effect = side_effect
+    return new_mock
+
+
 def test_post_live_metrics_data(mocker, monkeypatch):
     monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")
     monkeypatch.setenv(STUDIO_REPO_URL, "FOO_REPO_URL")
@@ -170,6 +185,7 @@ def test_post_live_metrics_data(mocker, monkeypatch):
     mocked_response = mocker.MagicMock()
     mocked_response.status_code = 200
     mocked_post = mocker.patch("requests.post", return_value=mocked_response)
+    mocked_post = copy_call_args(mocked_post)
 
     assert post_live_metrics("data", "f" * 40, "fooname", "fooclient", step=0)
     mocked_post.assert_called_with(
@@ -216,6 +232,8 @@ def test_post_live_metrics_data(mocker, monkeypatch):
     )
 
     mocked_post = mocker.patch("requests.post", return_value=mocked_response)
+    mocked_post = copy_call_args(mocked_post)
+
     assert post_live_metrics(
         "data",
         "f" * 40,
@@ -226,7 +244,7 @@ def test_post_live_metrics_data(mocker, monkeypatch):
         plots={"dvclive/plots/metrics/foo.tsv": {"data": [{"step": 0, "foo": 1.0}]}},
     )
 
-    assert mocked_post.has_calls(  # noqa: PGH005
+    mocked_post.assert_has_calls(
         [
             mocker.call(
                 "https://studio.iterative.ai/api/live",
@@ -499,6 +517,7 @@ def test_post_in_chunks(mocker, monkeypatch):
     mocked_image.__len__.return_value = 9000000
 
     mocked_post = mocker.patch("requests.post", return_value=mocked_response)
+    mocked_post = copy_call_args(mocked_post)
     assert post_live_metrics(
         "data",
         "f" * 40,
@@ -513,6 +532,7 @@ def test_post_in_chunks(mocker, monkeypatch):
 
     # 3.png will not be sent because it exceeds the limit size.
     mocked_post = mocker.patch("requests.post", return_value=mocked_response)
+    mocked_post = copy_call_args(mocked_post)
     assert post_live_metrics(
         "data",
         "f" * 40,
@@ -528,7 +548,7 @@ def test_post_in_chunks(mocker, monkeypatch):
         },
     )
     assert mocked_post.call_count == 2
-    assert mocked_post.has_calls(  # noqa: PGH005
+    mocked_post.assert_has_calls(
         [
             mocker.call(
                 "https://studio.iterative.ai/api/live",
@@ -558,7 +578,11 @@ def test_post_in_chunks(mocker, monkeypatch):
                     "name": "fooname",
                     "client": "fooclient",
                     "step": 0,
-                    "plots": {"dvclive/plots/images/foo.png": {"image": mocked_image}},
+                    "plots": {
+                        "dvclive/plots/images/0.png": {"image": mocked_image},
+                        "dvclive/plots/images/1.png": {"image": mocked_image},
+                        "dvclive/plots/images/2.png": {"image": mocked_image},
+                    },
                 },
                 headers={
                     "Authorization": "token FOO_TOKEN",
