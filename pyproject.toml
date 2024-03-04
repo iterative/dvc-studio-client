@@ -93,6 +93,10 @@ files = ["src", "tests"]
 [tool.codespell]
 ignore-words-list = " "
 
+[tool.ruff]
+output-format = "full"
+show-fixes = true
+
 [tool.ruff.lint]
 ignore = [
   "S101",  # assert
