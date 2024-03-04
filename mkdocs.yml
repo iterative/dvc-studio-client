@@ -18,6 +18,9 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/iterative/
 
+watch:
+  - src/dvc_studio_client
+
 plugins:
   - search
   - gen-files:
@@ -29,5 +32,3 @@ plugins:
         python:
           rendering:
             show_submodules: no
-      watch:
-        - src/dvc-studio-client
