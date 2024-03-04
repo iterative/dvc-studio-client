@@ -1,4 +1,5 @@
 """DVC Studio Client."""
+
 import logging
 from os import getenv
 

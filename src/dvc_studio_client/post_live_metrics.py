@@ -1,6 +1,6 @@
 import json
 from os import getenv
-from typing import Any, Dict, Literal, Optional
+from typing import Any, Literal, Optional
 from urllib.parse import urljoin
 
 import requests
@@ -112,13 +112,13 @@ def post_live_metrics(  # noqa: C901,PLR0912,PLR0913
     name: str,
     client: Literal["dvc", "dvclive"],
     experiment_rev: Optional[str] = None,
-    machine: Optional[Dict[str, Any]] = None,
+    machine: Optional[dict[str, Any]] = None,
     message: Optional[str] = None,
-    metrics: Optional[Dict[str, Any]] = None,
-    params: Optional[Dict[str, Any]] = None,
-    plots: Optional[Dict[str, Any]] = None,
+    metrics: Optional[dict[str, Any]] = None,
+    params: Optional[dict[str, Any]] = None,
+    plots: Optional[dict[str, Any]] = None,
     step: Optional[int] = None,
-    dvc_studio_config: Optional[Dict[str, Any]] = None,
+    dvc_studio_config: Optional[dict[str, Any]] = None,
     offline: bool = False,
     studio_token: Optional[str] = None,
     studio_repo_url: Optional[str] = None,
@@ -254,7 +254,7 @@ def post_live_metrics(  # noqa: C901,PLR0912,PLR0913
             body["experiment_rev"] = experiment_rev
 
     else:
-        logger.warning(f"Invalid `event_type`: {event_type}")
+        logger.warning(f"Invalid `event_type`: {event_type}")  # type: ignore[unreachable]
         return None
 
     try:

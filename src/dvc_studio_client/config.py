@@ -1,7 +1,7 @@
 import re
 from functools import lru_cache
 from os import getenv
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from . import DEFAULT_STUDIO_URL, logger
 from .env import (
@@ -14,7 +14,7 @@ from .env import (
 )
 
 
-def _get_remote_url() -> str:
+def _get_remote_url() -> Optional[str]:
     from dulwich.porcelain import get_remote_repo
     from dulwich.repo import Repo
 
@@ -47,12 +47,12 @@ def get_studio_repo_url() -> Optional[str]:
 
 
 def get_studio_config(
-    dvc_studio_config: Optional[Dict[str, Any]] = None,
+    dvc_studio_config: Optional[dict[str, Any]] = None,
     offline: bool = False,
     studio_token: Optional[str] = None,
     studio_repo_url: Optional[str] = None,
     studio_url: Optional[str] = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Get studio config options.
 
     Args:

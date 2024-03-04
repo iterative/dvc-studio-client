@@ -1,5 +1,5 @@
 import sys
-from typing import List, Optional, TypedDict
+from typing import Optional, TypedDict
 from urllib.parse import urljoin
 
 import requests
@@ -108,7 +108,7 @@ def start_device_login(
     client_name: str,
     base_url: Optional[str] = None,
     token_name: Optional[str] = None,
-    scopes: Optional[List[str]] = None,
+    scopes: Optional[list[str]] = None,
 ) -> DeviceLoginResponse:
     """This method starts the device login process for Studio.
 

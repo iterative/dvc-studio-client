@@ -110,7 +110,7 @@ def test_studio_config_kwarg_override(monkeypatch):
 
 @pytest.mark.parametrize(
     "val",
-    ("1", "y", "yes", "true", True, 1),  # noqa: PT007
+    ("1", "y", "yes", "true", "True"),  # noqa: PT007
 )
 def test_studio_config_offline(monkeypatch, val):
     monkeypatch.setenv(DVC_STUDIO_TOKEN, "FOO_TOKEN")

@@ -18,16 +18,17 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/iterative/
 
+watch:
+  - src/dvc_studio_client
+
 plugins:
-- search
-- gen-files:
-    scripts:
-    - docs/gen_ref_pages.py
-- section-index
-- mkdocstrings:
-    handlers:
-      python:
-        rendering:
-          show_submodules: no
-    watch:
-    - src/dvc-studio-client
+  - search
+  - gen-files:
+      scripts:
+        - docs/gen_ref_pages.py
+  - section-index
+  - mkdocstrings:
+      handlers:
+        python:
+          rendering:
+            show_submodules: no
