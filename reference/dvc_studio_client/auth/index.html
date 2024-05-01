@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../assets/logo.svg">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.19">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.20">
     
     
       
@@ -850,9 +850,7 @@ else:
 
           <details class="quote">
             <summary>Source code in <code>dvc_studio_client/auth.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">174</span>
 <span class="normal">175</span>
 <span class="normal">176</span>
 <span class="normal">177</span>
@@ -908,7 +906,9 @@ else:
 <span class="normal">227</span>
 <span class="normal">228</span>
 <span class="normal">229</span>
-<span class="normal">230</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">check_token_authentication</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">device_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">check_token_authentication</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">device_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks the authentication status of a token based on a device code and</span>
 <span class="sd">    returns access token upon successful authentication.</span>
@@ -1249,7 +1249,9 @@ while the access token is a string representing the authorized access token.
 <span class="normal">166</span>
 <span class="normal">167</span>
 <span class="normal">168</span>
-<span class="normal">169</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">start_device_login</span><span class="p">(</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">start_device_login</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">client_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">base_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1282,20 +1284,22 @@ while the access token is a string representing the authorized access token.
         <span class="s2">&quot;Starting device login for Studio</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">if</span> <span class="n">base_url</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">if</span> <span class="n">invalid_scopes</span> <span class="o">:=</span> <span class="nb">list</span><span class="p">(</span>
-        <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AVAILABLE_SCOPES</span><span class="p">,</span> <span class="n">scopes</span><span class="p">),</span>  <span class="c1"># type: ignore[arg-type,attr-defined]</span>
-    <span class="p">):</span>
-        <span class="k">raise</span> <span class="n">InvalidScopesError</span><span class="p">(</span>  <span class="c1"># noqa: TRY003</span>
-            <span class="sa">f</span><span class="s2">&quot;Following scopes are not valid: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">invalid_scopes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type]</span>
-        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">scopes</span><span class="p">:</span>
+        <span class="n">invalid_scopes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">invalid_scopes</span> <span class="o">:=</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AVAILABLE_SCOPES</span><span class="p">,</span> <span class="n">scopes</span><span class="p">),</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InvalidScopesError</span><span class="p">(</span>  <span class="c1"># noqa: TRY003</span>
+                <span class="sa">f</span><span class="s2">&quot;Following scopes are not valid: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">invalid_scopes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
 
-    <span class="n">body</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;client_name&quot;</span><span class="p">:</span> <span class="n">client_name</span><span class="p">}</span>
+    <span class="n">body</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;client_name&quot;</span><span class="p">:</span> <span class="n">client_name</span><span class="p">}</span>
 
     <span class="k">if</span> <span class="n">token_name</span><span class="p">:</span>
         <span class="n">body</span><span class="p">[</span><span class="s2">&quot;token_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token_name</span>
 
     <span class="k">if</span> <span class="n">scopes</span><span class="p">:</span>
-        <span class="n">body</span><span class="p">[</span><span class="s2">&quot;scopes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scopes</span>  <span class="c1"># type: ignore[assignment]</span>
+        <span class="n">body</span><span class="p">[</span><span class="s2">&quot;scopes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scopes</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;JSON body `</span><span class="si">{</span><span class="n">body</span><span class="si">=}</span><span class="s2">`&quot;</span><span class="p">)</span>
 
