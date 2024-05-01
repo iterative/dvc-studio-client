@@ -1,5 +1,5 @@
 import sys
-from typing import Optional, TypedDict
+from typing import Optional, TypedDict, Union
 from urllib.parse import urljoin
 
 import requests
@@ -136,20 +136,22 @@ def start_device_login(
         "Starting device login for Studio%s",
         f" ({base_url})" if base_url else "",
     )
-    if invalid_scopes := list(
-        filter(lambda s: s.upper() not in AVAILABLE_SCOPES, scopes),  # type: ignore[arg-type,attr-defined]
-    ):
-        raise InvalidScopesError(  # noqa: TRY003
-            f"Following scopes are not valid: {', '.join(invalid_scopes)}",  # type: ignore[arg-type]
-        )
+    if scopes:
+        invalid_scopes: list[str]
+        if invalid_scopes := list(
+            filter(lambda s: s.upper() not in AVAILABLE_SCOPES, scopes),
+        ):
+            raise InvalidScopesError(  # noqa: TRY003
+                f"Following scopes are not valid: {', '.join(invalid_scopes)}",
+            )
 
-    body = {"client_name": client_name}
+    body: dict[str, Union[str, list[str]]] = {"client_name": client_name}
 
     if token_name:
         body["token_name"] = token_name
 
     if scopes:
-        body["scopes"] = scopes  # type: ignore[assignment]
+        body["scopes"] = scopes
 
     logger.debug(f"JSON body `{body=}`")
 
