@@ -75,7 +75,7 @@ def get_studio_config(
                 {
                     "token": "mytoken",
                     "repo_url": "git@github.com:iterative/dvc-studio-client.git",
-                    "url": "https://studio.iterative.ai",
+                    "url": "https://studio.dvc.ai",
                 }
     """
     config = {}

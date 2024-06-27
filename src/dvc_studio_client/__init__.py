@@ -14,4 +14,4 @@ logger.setLevel(
     getenv(DVC_STUDIO_CLIENT_LOGLEVEL, getenv(DVCLIVE_LOGLEVEL, "WARNING")).upper(),
 )
 
-DEFAULT_STUDIO_URL = "https://studio.iterative.ai"
+DEFAULT_STUDIO_URL = "https://studio.dvc.ai"
