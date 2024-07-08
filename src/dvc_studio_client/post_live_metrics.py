@@ -100,7 +100,7 @@ def _post_in_chunks(url, body, token):
             break
         body["plots"][plot_name] = plot_data
 
-    if body["plots"] and not _single_post(url, body, token):
+    if body["plots"] and not _single_post(url, body, token):  # noqa: SIM103
         return False
 
     return True
