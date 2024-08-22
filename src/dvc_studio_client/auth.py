@@ -118,7 +118,7 @@ def start_device_login(
 
     Optional Parameters:
     - base_url: The base URL of the Studio API.
-        If not provided, the default value is "https://studio.dvc.ai".
+        If not provided, the default value is "https://studio.datachain.ai".
     - token_name: The name of the token. If not provided, it defaults to None.
     - scopes: A list of scopes to request. If not provided, it defaults to None.
 
@@ -156,7 +156,7 @@ def start_device_login(
     logger.debug(f"JSON body `{body=}`")
 
     response = requests.post(
-        url=urljoin(base_url or "https://studio.dvc.ai", "api/device-login"),
+        url=urljoin(base_url or "https://studio.datachain.ai", "api/device-login"),
         json=body,
         headers={
             "Content-type": "application/json",
