@@ -1,4 +1,5 @@
 import pytest
+
 from dvc_studio_client.env import DVC_STUDIO_TOKEN, DVC_STUDIO_URL
 from dvc_studio_client.model_registry import get_download_uris
 

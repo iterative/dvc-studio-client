@@ -3,6 +3,8 @@ from copy import deepcopy
 from unittest.mock import DEFAULT, MagicMock
 
 import pytest
+from requests import RequestException
+
 from dvc_studio_client import DEFAULT_STUDIO_URL
 from dvc_studio_client.env import (
     DVC_STUDIO_REPO_URL,
@@ -16,7 +18,6 @@ from dvc_studio_client.post_live_metrics import (
     get_studio_token_and_repo_url,
     post_live_metrics,
 )
-from requests import RequestException
 
 
 def test_post_live_metrics_skip_on_missing_token(caplog):
