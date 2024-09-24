@@ -1,5 +1,7 @@
 import pytest
 import requests
+from requests import Response
+
 from dvc_studio_client.auth import (
     AuthorizationExpiredError,
     InvalidScopesError,
@@ -7,7 +9,6 @@ from dvc_studio_client.auth import (
     get_access_token,
     start_device_login,
 )
-from requests import Response
 
 MOCK_RESPONSE = {
     "verification_uri": "https://studio.example.com/auth/device-login",
@@ -18,7 +19,7 @@ MOCK_RESPONSE = {
 }
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_response(mocker):
     def _mock_response(status_code, json):
         response = Response()
@@ -29,7 +30,7 @@ def mock_response(mocker):
     return _mock_response
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_post(mocker, mock_response):
     def _mock_post(method, side_effect):
         return mocker.patch(
