@@ -45,7 +45,7 @@ tests = [
 dev = [
   "dvc-studio-client[tests,docs]",
   "types-requests",
-  "mypy==1.11.2"
+  "mypy==1.12.1"
 ]
 
 [tool.setuptools_scm]
