@@ -190,7 +190,7 @@ def test_post_live_metrics_data(mocker, monkeypatch):
 
     assert post_live_metrics("data", "f" * 40, "fooname", "fooclient", step=0)
     mocked_post.assert_called_with(
-        "https://studio.dvc.ai/api/live",
+        "https://studio.datachain.ai/api/live",
         json={
             "type": "data",
             "repo_url": "FOO_REPO_URL",
@@ -215,7 +215,7 @@ def test_post_live_metrics_data(mocker, monkeypatch):
         params={"dvclive/params.yaml": {"foo": "bar"}},
     )
     mocked_post.assert_called_with(
-        "https://studio.dvc.ai/api/live",
+        "https://studio.datachain.ai/api/live",
         json={
             "type": "data",
             "repo_url": "FOO_REPO_URL",
@@ -248,7 +248,7 @@ def test_post_live_metrics_data(mocker, monkeypatch):
     mocked_post.assert_has_calls(
         [
             mocker.call(
-                "https://studio.dvc.ai/api/live",
+                "https://studio.datachain.ai/api/live",
                 json={
                     "type": "data",
                     "repo_url": "FOO_REPO_URL",
@@ -267,7 +267,7 @@ def test_post_live_metrics_data(mocker, monkeypatch):
                 timeout=(30, 5),
             ),
             mocker.call(
-                "https://studio.dvc.ai/api/live",
+                "https://studio.datachain.ai/api/live",
                 json={
                     "type": "data",
                     "repo_url": "FOO_REPO_URL",
@@ -306,7 +306,7 @@ def test_post_live_metrics_done(mocker, monkeypatch):
         "fooclient",
     )
     mocked_post.assert_called_with(
-        "https://studio.dvc.ai/api/live",
+        "https://studio.datachain.ai/api/live",
         json={
             "type": "done",
             "repo_url": "FOO_REPO_URL",
@@ -329,7 +329,7 @@ def test_post_live_metrics_done(mocker, monkeypatch):
         experiment_rev="h" * 40,
     )
     mocked_post.assert_called_with(
-        "https://studio.dvc.ai/api/live",
+        "https://studio.datachain.ai/api/live",
         json={
             "type": "done",
             "repo_url": "FOO_REPO_URL",
@@ -353,7 +353,7 @@ def test_post_live_metrics_done(mocker, monkeypatch):
         metrics={"dvclive/metris.json": {"data": {"foo": 1}}},
     )
     mocked_post.assert_called_with(
-        "https://studio.dvc.ai/api/live",
+        "https://studio.datachain.ai/api/live",
         json={
             "type": "done",
             "repo_url": "FOO_REPO_URL",
@@ -551,7 +551,7 @@ def test_post_in_chunks(mocker, monkeypatch):
     mocked_post.assert_has_calls(
         [
             mocker.call(
-                "https://studio.dvc.ai/api/live",
+                "https://studio.datachain.ai/api/live",
                 json={
                     "type": "data",
                     "repo_url": "FOO_REPO_URL",
@@ -570,7 +570,7 @@ def test_post_in_chunks(mocker, monkeypatch):
                 timeout=(30, 5),
             ),
             mocker.call(
-                "https://studio.dvc.ai/api/live",
+                "https://studio.datachain.ai/api/live",
                 json={
                     "type": "data",
                     "repo_url": "FOO_REPO_URL",
