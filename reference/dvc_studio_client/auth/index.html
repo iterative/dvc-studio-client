@@ -1170,7 +1170,7 @@ while the access token is a string representing the authorized access token.
 </ul>
 <p>Optional Parameters:
 - base_url: The base URL of the Studio API.
-    If not provided, the default value is "https://studio.dvc.ai".
+    If not provided, the default value is "https://studio.datachain.ai".
 - token_name: The name of the token. If not provided, it defaults to None.
 - scopes: A list of scopes to request. If not provided, it defaults to None.</p>
 <h4 id="dvc_studio_client.auth.start_device_login--returns">Returns</h4>
@@ -1265,7 +1265,7 @@ while the access token is a string representing the authorized access token.
 
 <span class="sd">    Optional Parameters:</span>
 <span class="sd">    - base_url: The base URL of the Studio API.</span>
-<span class="sd">        If not provided, the default value is &quot;https://studio.dvc.ai&quot;.</span>
+<span class="sd">        If not provided, the default value is &quot;https://studio.datachain.ai&quot;.</span>
 <span class="sd">    - token_name: The name of the token. If not provided, it defaults to None.</span>
 <span class="sd">    - scopes: A list of scopes to request. If not provided, it defaults to None.</span>
 
@@ -1303,7 +1303,7 @@ while the access token is a string representing the authorized access token.
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;JSON body `</span><span class="si">{</span><span class="n">body</span><span class="si">=}</span><span class="s2">`&quot;</span><span class="p">)</span>
 
     <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
-        <span class="n">url</span><span class="o">=</span><span class="n">urljoin</span><span class="p">(</span><span class="n">base_url</span> <span class="ow">or</span> <span class="s2">&quot;https://studio.dvc.ai&quot;</span><span class="p">,</span> <span class="s2">&quot;api/device-login&quot;</span><span class="p">),</span>
+        <span class="n">url</span><span class="o">=</span><span class="n">urljoin</span><span class="p">(</span><span class="n">base_url</span> <span class="ow">or</span> <span class="s2">&quot;https://studio.datachain.ai&quot;</span><span class="p">,</span> <span class="s2">&quot;api/device-login&quot;</span><span class="p">),</span>
         <span class="n">json</span><span class="o">=</span><span class="n">body</span><span class="p">,</span>
         <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
             <span class="s2">&quot;Content-type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
