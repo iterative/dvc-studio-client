@@ -48,7 +48,7 @@ def _single_post(url, body, token):
 
     message = response.content.decode()
     logger.debug(
-        f"post_to_studio: {response.status_code=}" f", {message=}" if message else "",
+        f"post_to_studio: {response.status_code=}, {message=}" if message else "",
     )
 
     if response.status_code != 200:
