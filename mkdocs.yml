@@ -1,4 +1,4 @@
-site_name: dvc-studio-client
+site_name: "DVC Studio Client"
 
 theme:
   name: material
@@ -30,5 +30,5 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
-          rendering:
+          options:
             show_submodules: no
