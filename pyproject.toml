@@ -40,7 +40,7 @@ docs = [
   "mkdocstrings-python>=1.6.3,<2"
 ]
 tests = [
-  "pytest>=7,<9",
+  "pytest>=9,<10",
   "pytest-cov>=4.1.0",
   "pytest-sugar",
   "pytest-mock"
