@@ -74,6 +74,6 @@ please `file an issue`_ along with a detailed description.
 .. github-only
 .. _Contributor Guide: CONTRIBUTING.rst
 .. _DVC Studio: https://dvc.org/doc/studio
-.. _get_download_uris: https://docs.iterative.ai/dvc-studio-client/reference/dvc_studio_client/model_registry/
-.. _post_live_metrics: https://docs.iterative.ai/dvc-studio-client/reference/dvc_studio_client/post_live_metrics/
-.. _get_access_token: https://docs.iterative.ai/dvc-studio-client/reference/dvc_studio_client/auth/
+.. _get_download_uris: https://treeverse.github.io/dvc-studio-client/reference/dvc_studio_client/model_registry/
+.. _post_live_metrics: https://treeverse.github.io/dvc-studio-client/reference/dvc_studio_client/post_live_metrics/
+.. _get_access_token: https://treeverse.github.io/dvc-studio-client/reference/dvc_studio_client/auth/
